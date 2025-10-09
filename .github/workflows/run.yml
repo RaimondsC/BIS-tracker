@@ -66,6 +66,10 @@ jobs:
           mkdir -p shards
           find _artifacts -name "*.csv" -exec cp {} shards/ \;
           ls -la shards
+          
+      - name: Install deps for merge
+        run: |
+          python -m pip install pandas==2.2.2
 
       - name: Merge & diff
         run: python merge_and_diff.py
