@@ -33,16 +33,26 @@ jobs:
       - name: Scrape shard
         env:
           AUTHORITIES_JSON: ${{ matrix.shard }}
-          MAX_PAGES_PER_COMBO: "50"   # adjust up/down to tune runtime
+          MAX_PAGES_PER_COMBO: "20"        # start small for safety; raise after success (e.g., 50)
           SHARD_OUTPUT: "shards/${{ strategy.job-index }}.csv"
+          SMOKE: "1"                       # first run: true -> run only 1 combo per shard for diagnosis
         run: |
           python scraper.py
+
+      - name: Upload debug screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-${{ strategy.job-index }}
+          path: debug
+          if-no-files-found: ignore
 
       - name: Upload shard CSV
         uses: actions/upload-artifact@v4
         with:
           name: shard-${{ strategy.job-index }}
           path: shards/${{ strategy.job-index }}.csv
+          if-no-files-found: ignore
 
   merge_and_email:
     needs: shard
@@ -56,6 +66,10 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install deps for merge
+        run: |
+          python -m pip install pandas==2.2.2
+
       - name: Download shard artifacts
         uses: actions/download-artifact@v4
         with:
@@ -65,11 +79,7 @@ jobs:
         run: |
           mkdir -p shards
           find _artifacts -name "*.csv" -exec cp {} shards/ \;
-          ls -la shards
-          
-      - name: Install deps for merge
-        run: |
-          python -m pip install pandas==2.2.2
+          ls -la shards || true
 
       - name: Merge & diff
         run: python merge_and_diff.py
