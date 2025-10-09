@@ -1,14 +1,14 @@
 import asyncio, os, re, json, pathlib
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup
-from playwright.async_api import async_playwright, TimeoutError as PWTimeout
+from playwright.async_api import async_playwright
 import pandas as pd
 
 URL = "https://bis.gov.lv/bisp/lv/planned_constructions"
 
-# ------------ YOUR FILTER SETS ------------
+# ------------ FILTER SETS (exact text) ------------
 ALL_AUTHORITIES = [
-    "RĪGAS VALSTSPILSĒTAS PAŠVALDĪBAS PAŠVALDĪBAS PILSĒTAS ATTĪSTĪBAS DEPARTAMENTS".replace(" PAŠVALDĪBAS PAŠVALDĪBAS"," PAŠVALDĪBAS"),
+    "RĪGAS VALSTSPILSĒTAS PAŠVALDĪBAS PILSĒTAS ATTĪSTĪBAS DEPARTAMENTS",
     "Ādažu novada būvvalde",
     "Saulkrastu novada būvvalde",
     "Ropažu novada pašvaldības būvvalde",
@@ -36,16 +36,13 @@ TYPES = [
     "Vienkāršota pārbūve",
 ]
 
-# Ieceres veids (Building permit)
+# Ieceres veids
 INTENT_TYPES = ["Būvatļauja"]
 
-# We must multi-select ALL usage types that start with "1" (ĒKAS + specific 1xxx codes)
-USAGE_PREFIX = r"^\s*1"   # regex for option text starting with "1"
-
-# Cap pages per (authority × phase × type × intention)
+# Page cap per (authority × phase × type × intention)
 MAX_PAGES_PER_COMBO = int(os.getenv("MAX_PAGES_PER_COMBO", "50"))
 
-# Sharding (env): AUTHORITIES_JSON is a JSON array of authority strings for this job
+# Sharding: AUTHORITIES_JSON (JSON array) -> limit authorities for this job
 _env = os.environ.get("AUTHORITIES_JSON", "")
 try:
     _parsed = json.loads(_env) if _env else []
@@ -53,9 +50,9 @@ except json.JSONDecodeError:
     _parsed = []
 AUTHORITIES = _parsed or ALL_AUTHORITIES
 
-# If set, dump shard rows here and exit (merged later)
+# If set, write shard CSV here and exit (merged later)
 SHARD_OUTPUT = os.getenv("SHARD_OUTPUT", "").strip()
-# -------------------------------------------
+# ---------------------------------------------------
 
 
 def row_id(r: dict) -> str:
@@ -116,11 +113,10 @@ def parse_table(html: str) -> list[dict]:
     return out
 
 
-# ---------------- UI HELPERS ----------------
-
-async def try_click(page, selector: str, timeout=2000) -> bool:
+# --------------- helpers (page/frame) ---------------
+async def try_click(root, selector: str, timeout=2000) -> bool:
     try:
-        loc = page.locator(selector).first
+        loc = root.locator(selector).first
         if await loc.count() > 0:
             await loc.click(timeout=timeout)
             return True
@@ -129,183 +125,118 @@ async def try_click(page, selector: str, timeout=2000) -> bool:
     return False
 
 
-async def open_advanced(page):
-    """
-    Ensure 'Izvērstā meklēšana' (Advanced search) is open so all filters are visible.
-    We'll click the toggle if we see its text.
-    """
-    # If there is a button that says "Izvērstā meklēšana", click it once
-    for txt in ["Izvērstā meklēšana", "Izvērstā", "Izvērst"]:
-        if await try_click(page, f"button:has-text('{txt}')", timeout=1200):
-            await page.wait_for_timeout(400)
-            break
-    # Some UIs use a link/label instead of button:
-    await try_click(page, f"text=Izvērstā meklēšana", timeout=800)
-
-
-async def set_combobox_by_name(page, name_regex: str, value: str) -> bool:
-    """Type-select an option in a combobox/textbox by accessible name."""
+async def set_combobox_by_name(root, name_regex: str, value: str) -> bool:
+    """Type-select option in combobox/textbox by accessible name, under `root` (page or frame)."""
     try:
-        box = page.get_by_role("combobox", name=re.compile(name_regex, re.I)).first
+        box = root.get_by_role("combobox", name=re.compile(name_regex, re.I)).first
         if await box.count() == 0:
-            box = page.get_by_role("textbox", name=re.compile(name_regex, re.I)).first
+            box = root.get_by_role("textbox", name=re.compile(name_regex, re.I)).first
         await box.click(timeout=1500)
         await box.fill("")
         await box.type(value, delay=25)
-        await page.get_by_role("option", name=value, exact=True).first.click(timeout=2000)
+        await root.get_by_role("option", name=value, exact=True).first.click(timeout=2000)
         return True
     except:
         return False
 
 
-async def select_usage_prefix_multi(page, label_regex: str, prefix_regex: str) -> bool:
-    """
-    Open 'Būves lietošanas veids' control and select ALL options whose text starts with '1'.
-    We reopen the dropdown between clicks because many UIs close after a selection.
-    """
-    ok_any = False
-    name_re = re.compile(label_regex, re.I)
-    prefix_re = re.compile(prefix_regex)
-
-    # Open the control once to prime it (by role name)
-    box = page.get_by_role("combobox", name=name_re).first
-    if await box.count() == 0:
-        box = page.get_by_role("textbox", name=name_re).first
-
-    if await box.count() == 0:
-        # as a fallback, try to find a trigger near the text label
-        await try_click(page, f":text('Būves lietošanas veids') >> .. >> button", timeout=1000)
-
-    # Now loop: each time, open dropdown, click ALL visible options starting with 1
-    # We do a few passes to catch virtualized lists.
-    for _ in range(4):
-        try:
-            await box.click(timeout=1200)
-        except:
-            pass
-
-        opts = page.get_by_role("option", name=prefix_re)
-        cnt = await opts.count()
-        if cnt == 0:
-            # try typing "1" to filter the list
-            try:
-                await box.fill("")
-                await box.type("1", delay=25)
-                await asyncio.sleep(0.1)
-                opts = page.get_by_role("option", name=prefix_re)
-                cnt = await opts.count()
-            except:
-                pass
-
-        clicked_this_round = 0
-        for i in range(cnt):
-            try:
-                # re-query every time because DOM changes after each click
-                opt = page.get_by_role("option", name=prefix_re).nth(0)
-                if await opt.count() == 0:
-                    break
-                await opt.click(timeout=1000)
-                ok_any = True
-                clicked_this_round += 1
-                # reopen dropdown for next selection
-                try:
-                    await box.click(timeout=600)
-                except:
-                    pass
-            except:
-                break
-
-        # if nothing more to click, stop looping
-        if clicked_this_round == 0:
-            break
-
-    return ok_any
-
-
-async def reset_filters(page):
-    # Try “Notīrīt” / “Notīrīt filtrus”
+async def reset_filters(root):
     for txt in ["Notīrīt filtrus", "Notīrīt", "Atiestatīt"]:
-        if await try_click(page, f"button:has-text('{txt}')", timeout=1200):
-            await page.wait_for_timeout(300)
+        if await try_click(root, f"button:has-text('{txt}')", timeout=1200):
+            await root.wait_for_timeout(300)
             return
-    # else reload page
-    await page.goto(URL, wait_until="domcontentloaded", timeout=180000)
-    await page.wait_for_timeout(400)
 
 
-async def submit_search(page):
+async def open_advanced(root):
+    for txt in ["Izvērstā meklēšana", "Izvērstā", "Izvērst"]:
+        if await try_click(root, f"button:has-text('{txt}')", timeout=1200):
+            await root.wait_for_timeout(400)
+            break
+    await try_click(root, f"text=Izvērstā meklēšana", timeout=800)
+
+
+async def submit_search(root):
     for text in ["Meklēt","Atrast","Search"]:
-        if await try_click(page, f"button:has-text('{text}')", timeout=1500):
-            await page.wait_for_timeout(700)
+        if await try_click(root, f"button:has-text('{text}')", timeout=1500):
+            await root.wait_for_timeout(700)
             return True
-    # fallback: press Enter on any combobox
     try:
-        await page.get_by_role("combobox").last.press("Enter")
-        await page.wait_for_timeout(700)
+        await root.get_by_role("combobox").last.press("Enter")
+        await root.wait_for_timeout(700)
         return True
     except:
         return False
 
 
-async def wait_for_results(page):
+async def wait_for_results(root):
     no_data_patterns = ["Nav datu", "Nav atrasts", "Rezultāti nav atrasti", "No data"]
     for _ in range(30):  # ~15s
-        if await page.locator("table >> tbody >> tr").count() > 0:
+        if await root.locator("table >> tbody >> tr").count() > 0:
             return "ok"
-        if await page.locator("table tr td").count() > 0:
+        if await root.locator("table tr td").count() > 0:
             return "ok"
         for pat in no_data_patterns:
-            if await page.get_by_text(re.compile(pat, re.I)).count() > 0:
+            if await root.get_by_text(re.compile(pat, re.I)).count() > 0:
                 return "empty"
-        await page.wait_for_timeout(500)
+        await root.wait_for_timeout(500)
     return "unknown"
 
-# -------------------------------------------
+
+async def get_search_root(page):
+    # Top-level?
+    if await page.get_by_text(re.compile("Ātrā meklēšana|Izvērstā meklēšana|Meklēt")).count() > 0:
+        return page
+    # Look in iframes
+    for frame in page.frames:
+        try:
+            if await frame.get_by_text(re.compile("Ātrā meklēšana|Izvērstā meklēšana|Meklēt")).count() > 0:
+                return frame
+        except:
+            continue
+    return page  # fallback
+# ----------------------------------------------------
 
 
-async def apply_filters(page, authority, phase, ctype, intention):
-    await reset_filters(page)
-    await open_advanced(page)
+async def apply_filters(root, authority, phase, ctype, intention):
+    await reset_filters(root)
+    await open_advanced(root)
 
-    okA = await set_combobox_by_name(page, r"Būvniecības kontroles institūcija", authority)
-    okB = await set_combobox_by_name(page, r"Būvniecības lietas stadija", phase)
-    okC = await set_combobox_by_name(page, r"Būvniecības veids", ctype)
-    okD = await set_combobox_by_name(page, r"Ieceres veids", intention)
+    okA = await set_combobox_by_name(root, r"Būvniecības kontroles institūcija", authority)
+    okB = await set_combobox_by_name(root, r"Būvniecības lietas stadija", phase)
+    okC = await set_combobox_by_name(root, r"Būvniecības veids", ctype)
+    okD = await set_combobox_by_name(root, r"Ieceres veids", intention)
 
-    # Būves lietošanas veids → select ALL options that start with "1"
-    okE = await select_usage_prefix_multi(page, r"Būves lietošanas veids", USAGE_PREFIX)
+    submitted = await submit_search(root)
+    state = await wait_for_results(root)
 
-    submitted = await submit_search(page)
-    state = await wait_for_results(page)
-
-    print(f"[FILTERS] A:{okA} B:{okB} C:{okC} D:{okD} E:{okE} submit:{submitted} state:{state} | "
+    print(f"[FILTERS] A:{okA} B:{okB} C:{okC} D:{okD} submit:{submitted} state:{state} | "
           f"{authority} | {phase} | {ctype} | {intention}")
 
     return state != "empty"
 
 
-async def click_next(page) -> bool:
+async def click_next(root) -> bool:
     for sel in [
         "button[aria-label*='Nākam']",
         "a[aria-label*='Nākam']",
         "button:has-text('Nākam')",
         "a:has-text('Nākam')",
     ]:
-        if await try_click(page, sel, timeout=1500):
-            await page.wait_for_timeout(500)
+        if await try_click(root, sel, timeout=1500):
+            await root.wait_for_timeout(500)
             return True
     return False
 
 
-async def scrape_combo(page, authority, phase, ctype, intention):
-    has_rows = await apply_filters(page, authority, phase, ctype, intention)
+async def scrape_combo(root, authority, phase, ctype, intention):
+    has_rows = await apply_filters(root, authority, phase, ctype, intention)
     if not has_rows:
         print(f"[EMPTY] {authority} | {phase} | {ctype} | {intention}")
         return [], 0
 
     results, pages = [], 0
     while pages < MAX_PAGES_PER_COMBO:
-        html = await page.content()
+        html = await root.content()
         rows = parse_table(html)
         if not rows:
             break
@@ -316,7 +247,7 @@ async def scrape_combo(page, authority, phase, ctype, intention):
             r["intention_type"] = intention
         results.extend(rows)
         pages += 1
-        if not await click_next(page):
+        if not await click_next(root):
             break
 
     print(f"[OK] {authority} | {phase} | {ctype} | {intention} -> rows:{len(results)} pages:{pages}")
@@ -349,12 +280,14 @@ async def main():
                 pass
         await page.wait_for_timeout(600)
 
+        root = await get_search_root(page)
+
         all_rows, total_pages = [], 0
         for authority in AUTHORITIES:
             for phase in PHASES:
                 for ctype in TYPES:
                     for intention in INTENT_TYPES:
-                        chunk, walked = await scrape_combo(page, authority, phase, ctype, intention)
+                        chunk, walked = await scrape_combo(root, authority, phase, ctype, intention)
                         all_rows.extend(chunk)
                         total_pages += walked
 
@@ -394,9 +327,9 @@ async def main():
         f"- Kopā rindas: {len(cur_map)}",
         f"- Jauni: {len(new_ids)}",
         f"- Noņemti: {len(gone_ids)}",
-        f"- Atjaunināti: {len(changed)}",
-        f"- Lapu limits vienai kombinācijai: {MAX_PAGES_PER_COMBO}",
-        f"- Faktiski pārlapotas lapas: {total_pages}",
+        f("- Atjaunināti: " + str(len(changed))),
+        f("- Lapu limits vienai kombinācijai: {MAX_PAGES_PER_COMBO}"),
+        f("- Faktiski pārlapotas lapas: {total_pages}"),
         "",
         "## Jaunie",
     ]
