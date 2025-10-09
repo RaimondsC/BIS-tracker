@@ -1,15 +1,23 @@
-name: BIS Tracker (weekly deep + email)
+name: BIS Tracker (weekly, 3 shards, single email)
 
 on:
   schedule:
-    - cron: "0 3 * * 1"   # Mondays ~06:00 Riga summer / ~05:00 winter
+    - cron: "0 3 * * 1"   # Mondays ~06:00 Riga (summer) / ~05:00 winter
   workflow_dispatch: {}
 
 jobs:
-  deep_scan:
+  shard:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        shard:
+          # Shard 0: Rīga alone
+          - '["RĪGAS VALSTSPILSĒTAS PAŠVALDĪBAS PILSĒTAS ATTĪSTĪBAS DEPARTAMENTS"]'
+          # Shard 1:
+          - '["Ādažu novada būvvalde","Saulkrastu novada būvvalde","Ropažu novada pašvaldības būvvalde","Siguldas novada būvvalde"]'
+          # Shard 2:
+          - '["Salaspils novada pašvaldības iestāde \\"Salaspils novada Būvvalde\\"","Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde","Ķekavas novada pašvaldības būvvalde","OLAINES NOVADA PAŠVALDĪBAS BŪVVALDE","Mārupes novada Būvvalde","Jūrmalas Būvvalde"]'
     steps:
       - uses: actions/checkout@v4
 
@@ -22,41 +30,71 @@ jobs:
           python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      - name: Scrape (weekly, with page cap)
+      - name: Scrape shard
         env:
-          LANG: "lv"
-          MAX_PAGES_PER_COMBO: "50"         # ← you can raise/lower this
-          MAX_PAGES_HARD_CAP: "50"          # keep equal to enforce the cap hard
+          AUTHORITIES_JSON: ${{ matrix.shard }}
+          MAX_PAGES_PER_COMBO: "50"   # adjust up/down to tune runtime
+          SHARD_OUTPUT: "shards/${{ strategy.job-index }}.csv"
         run: |
           python scraper.py
+
+      - name: Upload shard CSV
+        uses: actions/upload-artifact@v4
+        with:
+          name: shard-${{ strategy.job-index }}
+          path: shards/${{ strategy.job-index }}.csv
+
+  merge_and_email:
+    needs: shard
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download shard artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: Collect CSVs
+        run: |
+          mkdir -p shards
+          find _artifacts -name "*.csv" -exec cp {} shards/ \;
+          ls -la shards
+
+      - name: Merge & diff
+        run: python merge_and_diff.py
 
       - name: Commit reports
         run: |
           git config user.name "bis-bot"
           git config user.email "bis-bot@users.noreply.github.com"
           git add reports/*.csv reports/CHANGELOG.md || true
-          git commit -m "Weekly scan: $(date -u +'%Y-%m-%d %H:%M')" || echo "Nothing to commit"
+          git commit -m "Weekly merge: $(date -u +'%Y-%m-%d %H:%M')" || echo "Nothing to commit"
           git push
 
-      - name: Send email with report
+      - name: Email combined report
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.SMTP_SERVER }}
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: BIS weekly tracker – report ${{ github.run_id }}
+          subject: BIS weekly tracker – combined report ${{ github.run_id }}
           to: ${{ secrets.MAIL_TO }}
           from: ${{ secrets.MAIL_FROM }}
           secure: true
           html_body: |
-            <p>Sveiki!</p>
-            <p>Šonedēļas rezultāti ir ģenerēti un pievienoti mapē <code>reports/</code>.</p>
+            <p>Sveiki! Pievienota šīs nedēļas apkopotā atskaite.</p>
             <ul>
               <li><code>CHANGELOG.md</code> – kopsavilkums (pielikumā)</li>
               <li><code>latest.csv</code> – pilns momentuzņēmums (pielikumā)</li>
             </ul>
-            <p>Parametri: lapu limits katrai kombinācijai = ${{ env.MAX_PAGES_PER_COMBO }}; valoda = ${{ env.LANG }}.</p>
           attachments: |
             reports/CHANGELOG.md
             reports/latest.csv
