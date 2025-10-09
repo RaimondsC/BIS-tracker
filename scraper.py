@@ -8,7 +8,7 @@ URL = "https://bis.gov.lv/bisp/lv/planned_constructions"
 
 # ------------ FILTER SETS (exact text) ------------
 ALL_AUTHORITIES = [
-    "RĪGAS VALSTSPILSĒTAS PAŠVALDĪBAS PILSĒTAS ATTĪSTĪBAS DEPARTAMENTS",
+    "RĪGAS VALSTSPILSĒTAS PAŠVALDĪBAS PILSĒTĪBAS ATTĪSTĪBAS DEPARTAMENTS".replace(" PILSĒTĪBAS"," PILSĒTAS"),
     "Ādažu novada būvvalde",
     "Saulkrastu novada būvvalde",
     "Ropažu novada pašvaldības būvvalde",
@@ -39,10 +39,10 @@ TYPES = [
 # Ieceres veids
 INTENT_TYPES = ["Būvatļauja"]
 
-# Page cap per (authority × phase × type × intention)
+# Page cap per (authority × phase × type × intention) — can override in workflow env
 MAX_PAGES_PER_COMBO = int(os.getenv("MAX_PAGES_PER_COMBO", "50"))
 
-# Sharding: AUTHORITIES_JSON (JSON array) -> limit authorities for this job
+# Sharding: a JSON array of authority strings for this job (or empty -> all)
 _env = os.environ.get("AUTHORITIES_JSON", "")
 try:
     _parsed = json.loads(_env) if _env else []
@@ -52,6 +52,13 @@ AUTHORITIES = _parsed or ALL_AUTHORITIES
 
 # If set, write shard CSV here and exit (merged later)
 SHARD_OUTPUT = os.getenv("SHARD_OUTPUT", "").strip()
+
+# Smoke mode: run only 1 combo with small page cap (fast diagnosis)
+SMOKE = os.getenv("SMOKE", "0").strip() == "1"
+
+# Debug screenshots (first combo only)
+DEBUG_DIR = pathlib.Path("debug")
+DEBUG_DIR.mkdir(exist_ok=True)
 # ---------------------------------------------------
 
 
@@ -113,7 +120,7 @@ def parse_table(html: str) -> list[dict]:
     return out
 
 
-# --------------- helpers (page/frame) ---------------
+# --------------- helpers (work on page OR frame) ---------------
 async def try_click(root, selector: str, timeout=2000) -> bool:
     try:
         loc = root.locator(selector).first
@@ -152,7 +159,7 @@ async def open_advanced(root):
         if await try_click(root, f"button:has-text('{txt}')", timeout=1200):
             await root.wait_for_timeout(400)
             break
-    await try_click(root, f"text=Izvērstā meklēšana", timeout=800)
+    await try_click(root, "text=Izvērstā meklēšana", timeout=800)
 
 
 async def submit_search(root):
@@ -169,13 +176,13 @@ async def submit_search(root):
 
 
 async def wait_for_results(root):
-    no_data_patterns = ["Nav datu", "Nav atrasts", "Rezultāti nav atrasti", "No data"]
+    no_data = ["Nav datu", "Nav atrasts", "Rezultāti nav atrasti", "No data"]
     for _ in range(30):  # ~15s
         if await root.locator("table >> tbody >> tr").count() > 0:
             return "ok"
         if await root.locator("table tr td").count() > 0:
             return "ok"
-        for pat in no_data_patterns:
+        for pat in no_data:
             if await root.get_by_text(re.compile(pat, re.I)).count() > 0:
                 return "empty"
         await root.wait_for_timeout(500)
@@ -183,7 +190,7 @@ async def wait_for_results(root):
 
 
 async def get_search_root(page):
-    # Top-level?
+    # Top level?
     if await page.get_by_text(re.compile("Ātrā meklēšana|Izvērstā meklēšana|Meklēt")).count() > 0:
         return page
     # Look in iframes
@@ -194,10 +201,10 @@ async def get_search_root(page):
         except:
             continue
     return page  # fallback
-# ----------------------------------------------------
+# --------------------------------------------------------------
 
 
-async def apply_filters(root, authority, phase, ctype, intention):
+async def apply_filters(root, authority, phase, ctype, intention, take_debug=False):
     await reset_filters(root)
     await open_advanced(root)
 
@@ -206,11 +213,23 @@ async def apply_filters(root, authority, phase, ctype, intention):
     okC = await set_combobox_by_name(root, r"Būvniecības veids", ctype)
     okD = await set_combobox_by_name(root, r"Ieceres veids", intention)
 
+    if take_debug:
+        try:
+            await root.page.screenshot(path=str(DEBUG_DIR / "01_after_setting_filters.png"), full_page=True)
+        except:
+            pass
+
     submitted = await submit_search(root)
     state = await wait_for_results(root)
 
     print(f"[FILTERS] A:{okA} B:{okB} C:{okC} D:{okD} submit:{submitted} state:{state} | "
           f"{authority} | {phase} | {ctype} | {intention}")
+
+    if take_debug:
+        try:
+            await root.page.screenshot(path=str(DEBUG_DIR / "02_after_search.png"), full_page=True)
+        except:
+            pass
 
     return state != "empty"
 
@@ -228,8 +247,8 @@ async def click_next(root) -> bool:
     return False
 
 
-async def scrape_combo(root, authority, phase, ctype, intention):
-    has_rows = await apply_filters(root, authority, phase, ctype, intention)
+async def scrape_combo(root, authority, phase, ctype, intention, take_debug=False):
+    has_rows = await apply_filters(root, authority, phase, ctype, intention, take_debug=take_debug)
     if not has_rows:
         print(f"[EMPTY] {authority} | {phase} | {ctype} | {intention}")
         return [], 0
@@ -282,14 +301,20 @@ async def main():
 
         root = await get_search_root(page)
 
+        # Build all combos
+        combos = [(a, ph, ct, it) for a in AUTHORITIES for ph in PHASES for ct in TYPES for it in INTENT_TYPES]
+
+        # Smoke mode: run only the first combo (quick diagnosis)
+        if SMOKE and combos:
+            combos = [combos[0]]
+
         all_rows, total_pages = [], 0
-        for authority in AUTHORITIES:
-            for phase in PHASES:
-                for ctype in TYPES:
-                    for intention in INTENT_TYPES:
-                        chunk, walked = await scrape_combo(root, authority, phase, ctype, intention)
-                        all_rows.extend(chunk)
-                        total_pages += walked
+        first = True
+        for authority, phase, ctype, intention in combos:
+            chunk, walked = await scrape_combo(root, authority, phase, ctype, intention, take_debug=first)
+            first = False
+            all_rows.extend(chunk)
+            total_pages += walked
 
         await browser.close()
 
@@ -327,9 +352,9 @@ async def main():
         f"- Kopā rindas: {len(cur_map)}",
         f"- Jauni: {len(new_ids)}",
         f"- Noņemti: {len(gone_ids)}",
-        f("- Atjaunināti: " + str(len(changed))),
-        f("- Lapu limits vienai kombinācijai: {MAX_PAGES_PER_COMBO}"),
-        f("- Faktiski pārlapotas lapas: {total_pages}"),
+        f"- Atjaunināti: {len(changed)}",
+        f"- Lapu limits vienai kombinācijai: {MAX_PAGES_PER_COMBO}",
+        f"- Faktiski pārlapotas lapas: {total_pages}",
         "",
         "## Jaunie",
     ]
@@ -343,7 +368,7 @@ async def main():
     lines += ["", "## Atjaunināti"]
     for ch in changed:
         before, after = ch["before"], ch["after"]
-        lines += [f"- **{after.get('authority','?')}** — {after.get('bis_number','?')} — {after.get('address','?')} — {after.get('object','?')}"]
+        lines += [f"- **{after.get('authority','?')}** — {after.get('bis_number','?')}** — {after.get('address','?')} — {after.get('object','?')}"]
         for f in ch["fields"]:
             lines += [f"  - {f}: `{before.get(f,'')}` → `{after.get(f,'')}`"]
     lines += ["", "## Noņemti (ID)"] + [f"- {i}" for i in gone_ids]
