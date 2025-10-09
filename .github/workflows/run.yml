@@ -2,8 +2,7 @@ name: BIS Tracker (weekly deep + email)
 
 on:
   schedule:
-    # Mondays ~06:00 Riga ≈ 03:00 UTC (summer). In winter this is ~05:00 Riga.
-    - cron: "0 3 * * 1"
+    - cron: "0 3 * * 1"   # Mondays ~06:00 Riga summer / ~05:00 winter
   workflow_dispatch: {}
 
 jobs:
@@ -23,10 +22,11 @@ jobs:
           python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      - name: Scrape (DEEP, all pages)
+      - name: Scrape (weekly, with page cap)
         env:
-          LANG: "lv"   # change to "en" if you prefer English labels
-          MAX_PAGES_HARD_CAP: "5000"
+          LANG: "lv"
+          MAX_PAGES_PER_COMBO: "50"         # ← you can raise/lower this
+          MAX_PAGES_HARD_CAP: "50"          # keep equal to enforce the cap hard
         run: |
           python scraper.py
 
@@ -35,10 +35,9 @@ jobs:
           git config user.name "bis-bot"
           git config user.email "bis-bot@users.noreply.github.com"
           git add reports/*.csv reports/CHANGELOG.md || true
-          git commit -m "Weekly deep scan: $(date -u +'%Y-%m-%d %H:%M')" || echo "Nothing to commit"
+          git commit -m "Weekly scan: $(date -u +'%Y-%m-%d %H:%M')" || echo "Nothing to commit"
           git push
 
-      # ===== EMAIL (uses SMTP) =====
       - name: Send email with report
         uses: dawidd6/action-send-mail@v3
         with:
@@ -52,12 +51,12 @@ jobs:
           secure: true
           html_body: |
             <p>Sveiki!</p>
-            <p>Pievienoti šīs nedēļas rezultāti mapē <code>reports/</code> (privātā repozitorijā).</p>
+            <p>Šonedēļas rezultāti ir ģenerēti un pievienoti mapē <code>reports/</code>.</p>
             <ul>
               <li><code>CHANGELOG.md</code> – kopsavilkums (pielikumā)</li>
               <li><code>latest.csv</code> – pilns momentuzņēmums (pielikumā)</li>
             </ul>
-            <p>Ja vajag biežākus atjauninājumus vai papildu filtrus (piem., atslēgvārdi objektam/adresei), dod ziņu.</p>
+            <p>Parametri: lapu limits katrai kombinācijai = ${{ env.MAX_PAGES_PER_COMBO }}; valoda = ${{ env.LANG }}.</p>
           attachments: |
             reports/CHANGELOG.md
             reports/latest.csv
