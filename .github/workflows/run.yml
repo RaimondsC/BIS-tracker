@@ -1,8 +1,8 @@
-name: BIS Tracker (single job, local parsing)
+name: BIS Tracker (single job, direct URL pagination)
 
 on:
   schedule:
-    - cron: "0 3 * * 1"
+    - cron: "0 3 * * 1"   # Mondays ~06:00 Riga summer / ~05:00 winter
   workflow_dispatch: {}
 
 jobs:
@@ -20,9 +20,9 @@ jobs:
           python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      - name: Scrape (local parsing)
+      - name: Scrape (local parsing via /list?page=N)
         env:
-          PAGES_TOTAL: "30"
+          PAGES_TOTAL: "300"           # set to 30 for a quick test, 300/600/1000 for deeper runs
         run: |
           python scraper.py
 
@@ -38,7 +38,7 @@ jobs:
         run: |
           git config user.name "bis-bot"
           git config user.email "bis-bot@users.noreply.github.com"
-          git add reports/*.csv reports/CHANGELOG.md || true
+          git add reports/*.csv reports/CHANGELOG.md reports/report.html reports/report.docx* || true
           git commit -m "Snapshot: $(date -u +'%Y-%m-%d %H:%M')" || echo "Nothing to commit"
           git push
 
@@ -52,13 +52,17 @@ jobs:
           subject: BIS tracker — snapshot ${{ github.run_id }}
           to: ${{ secrets.MAIL_TO }}
           from: ${{ secrets.MAIL_FROM }}
-          secure: false         # <-- IMPORTANT for 587
+          secure: false            # port 587 + STARTTLS (no 'starttls' key needed)
           html_body: |
             <p>Sveiki! Pievienota šodienas momentuzņēmuma atskaite.</p>
             <ul>
-              <li><code>CHANGELOG.md</code> – kopsavilkums (pielikumā)</li>
-              <li><code>latest.csv</code> – pilns momentuzņēmums (pielikumā)</li>
+              <li><code>report.html</code> – tīra HTML tabula ar saitēm</li>
+              <li><code>report.docx</code> – Word dokuments ar saitēm</li>
+              <li><code>latest.csv</code> – CSV (UTF-8-SIG Excelam)</li>
+              <li><code>CHANGELOG.md</code> – kopsavilkums</li>
             </ul>
           attachments: |
-            reports/CHANGELOG.md
+            reports/report.html
+            reports/report.docx
             reports/latest.csv
+            reports/CHANGELOG.md
