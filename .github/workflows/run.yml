@@ -2,7 +2,7 @@ name: BIS Tracker (single job, local parsing)
 
 on:
   schedule:
-    - cron: "0 3 * * 1"   # Mondays ~06:00 Riga (summer) / ~05:00 winter
+    - cron: "0 3 * * 1"
   workflow_dispatch: {}
 
 jobs:
@@ -22,9 +22,17 @@ jobs:
 
       - name: Scrape (local parsing)
         env:
-          PAGES_TOTAL: "300"     # <-- change this number to 1000 later if desired
+          PAGES_TOTAL: "300"
         run: |
           python scraper.py
+
+      - name: Upload debug HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-pages
+          path: debug
+          if-no-files-found: ignore
 
       - name: Commit reports
         run: |
@@ -37,14 +45,15 @@ jobs:
       - name: Email report
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: ${{ secrets.SMTP_SERVER }}
-          server_port: ${{ secrets.SMTP_PORT }}
+          server_address: ${{ secrets.SMTP_SERVER }}   # smtp.gmail.com
+          server_port: ${{ secrets.SMTP_PORT }}        # 587
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: BIS tracker — snapshot ${{ github.run_id }}
           to: ${{ secrets.MAIL_TO }}
           from: ${{ secrets.MAIL_FROM }}
-          secure: true
+          secure: false         # <-- IMPORTANT for 587
+          starttls: true        # <-- use STARTTLS
           html_body: |
             <p>Sveiki! Pievienota šodienas momentuzņēmuma atskaite.</p>
             <ul>
