@@ -53,7 +53,6 @@ jobs:
           to: ${{ secrets.MAIL_TO }}
           from: ${{ secrets.MAIL_FROM }}
           secure: false         # <-- IMPORTANT for 587
-          starttls: true        # <-- use STARTTLS
           html_body: |
             <p>Sveiki! Pievienota šodienas momentuzņēmuma atskaite.</p>
             <ul>
