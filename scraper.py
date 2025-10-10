@@ -36,7 +36,7 @@ TYPE_KEEP = {
 }
 # ----
 
-PAGES_TOTAL = int(os.getenv("PAGES_TOTAL", "300"))
+PAGES_TOTAL = int(os.getenv("PAGES_TOTAL", "30"))
 DEBUG_DIR = pathlib.Path("debug"); DEBUG_DIR.mkdir(exist_ok=True)
 REPORTS = pathlib.Path("reports"); REPORTS.mkdir(parents=True, exist_ok=True)
 
