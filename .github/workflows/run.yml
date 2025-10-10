@@ -22,7 +22,7 @@ jobs:
 
       - name: Scrape (local parsing)
         env:
-          PAGES_TOTAL: "300"
+          PAGES_TOTAL: "30"
         run: |
           python scraper.py
 
