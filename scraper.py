@@ -1,4 +1,4 @@
-import asyncio, os, re, json, pathlib
+import asyncio, os, re, pathlib, hashlib
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
@@ -6,9 +6,9 @@ import pandas as pd
 
 URL = "https://bis.gov.lv/bisp/lv/planned_constructions"
 
-# ------------ FILTER SETS (exact text) ------------
-ALL_AUTHORITIES = [
-    "RĪGAS VALSTSPILSĒTAS PAŠVALDĪBAS PILSĒTĪBAS ATTĪSTĪBAS DEPARTAMENTS".replace(" PILSĒTĪBAS"," PILSĒTAS"),
+# ---------------- Your filters (exact strings) ----------------
+AUTHORITIES_WHITELIST = {
+    "RĪGAS VALSTSPILSĒTAS PAŠVALDĪBAS PILSĒTAS ATTĪSTĪBAS DEPARTAMENTS",
     "Ādažu novada būvvalde",
     "Saulkrastu novada būvvalde",
     "Ropažu novada pašvaldības būvvalde",
@@ -19,80 +19,54 @@ ALL_AUTHORITIES = [
     "OLAINES NOVADA PAŠVALDĪBAS BŪVVALDE",
     "Mārupes novada Būvvalde",
     "Jūrmalas Būvvalde",
-]
+}
 
-PHASES = [
+PHASE_KEEP = {
     "Iecere",
     "Būvniecības ieceres publiskā apspriešana",
     "Projektēšanas nosacījumu izpilde",
     "Būvdarbu uzsākšanas nosacījumu izpilde",
-]
+}
 
-TYPES = [
+TYPE_KEEP = {
     "Atjaunošana",
     "Vienkāršota atjaunošana",
     "Jauna būvniecība",
     "Pārbūve",
     "Vienkāršota pārbūve",
-]
+}
+# ----------------------------------------------------------------
 
-# Ieceres veids
-INTENT_TYPES = ["Būvatļauja"]
+# Page cap (total pages to crawl from page 1). Override in workflow env.
+PAGES_TOTAL = int(os.getenv("PAGES_TOTAL", "300"))
 
-# Page cap per (authority × phase × type × intention) — can override in workflow env
-MAX_PAGES_PER_COMBO = int(os.getenv("MAX_PAGES_PER_COMBO", "50"))
-
-# Sharding: a JSON array of authority strings for this job (or empty -> all)
-_env = os.environ.get("AUTHORITIES_JSON", "")
-try:
-    _parsed = json.loads(_env) if _env else []
-except json.JSONDecodeError:
-    _parsed = []
-AUTHORITIES = _parsed or ALL_AUTHORITIES
-
-# If set, write shard CSV here and exit (merged later)
-SHARD_OUTPUT = os.getenv("SHARD_OUTPUT", "").strip()
-
-# Smoke mode: run only 1 combo with small page cap (fast diagnosis)
-SMOKE = os.getenv("SMOKE", "0").strip() == "1"
-
-# Debug screenshots (first combo only)
-DEBUG_DIR = pathlib.Path("debug")
-DEBUG_DIR.mkdir(exist_ok=True)
-# ---------------------------------------------------
-
-
-def row_id(r: dict) -> str:
+def stable_row_id(r: dict) -> str:
+    """Prefer BIS number; otherwise hash a few stable fields."""
     if r.get("bis_number"):
         return f"bis:{r['bis_number']}"
-    key = "|".join(str(r.get(k, "")) for k in [
-        "authority","address","object","phase","construction_type","intention_type"
-    ])
-    import hashlib
+    key = "|".join(str(r.get(k, "")) for k in ["authority","address","object","phase","construction_type"])
     return "h:" + hashlib.sha256(key.encode("utf-8")).hexdigest()[:16]
-
 
 def parse_table(html: str) -> list[dict]:
     soup = BeautifulSoup(html, "lxml")
     table = soup.find("table") or soup.find(attrs={"role": "table"})
-    out = []
     if not table:
-        return out
+        return []
 
     headers = [th.get_text(" ", strip=True) for th in table.find_all("th")]
 
-    def grab(cells, names):
+    def val(cells, names):
         for n in names:
             if n in headers:
                 return cells[headers.index(n)]
-        return None
+        return ""
 
+    out = []
     for tr in table.find_all("tr"):
         tds = tr.find_all("td")
         if not tds:
             continue
         cells = [td.get_text(" ", strip=True) for td in tds]
-
         a = tr.find("a", href=True)
         link = None
         if a and "bisp" in a["href"]:
@@ -100,139 +74,40 @@ def parse_table(html: str) -> list[dict]:
             if link.startswith("/"):
                 link = "https://bis.gov.lv" + link
 
-        r = {
-            "bis_number":        grab(cells, ["Lietas numurs","BIS lietas numurs","Lietas Nr."]),
-            "authority":         grab(cells, ["Būvniecības kontroles institūcija","Institūcija","Būvvalde"]),
-            "address":           grab(cells, ["Adrese","Būvobjekta adrese"]),
-            "object":            grab(cells, ["Būvobjekts","Nosaukums","Objekts"]),
-            "phase":             grab(cells, ["Būvniecības lietas stadija","Stadija","Statuss"]),
-            "construction_type": grab(cells, ["Būvniecības veids","Veids"]),
+        rec = {
+            "bis_number":        val(cells, ["Lietas numurs","BIS lietas numurs","Lietas Nr."]),
+            "authority":         val(cells, ["Būvniecības kontroles institūcija","Institūcija","Būvvalde"]),
+            "address":           val(cells, ["Adrese","Būvobjekta adrese"]),
+            "object":            val(cells, ["Būvobjekts","Nosaukums","Objekts"]),
+            "phase":             val(cells, ["Būvniecības lietas stadija","Stadija","Statuss"]),
+            "construction_type": val(cells, ["Būvniecības veids","Veids"]),
             "details_url":       link,
         }
-
-        # Exclude once it becomes "Būvdarbi"
-        if r["phase"] and r["phase"].strip().lower().startswith("būvdarbi"):
+        # Local filtering
+        if rec["phase"] and rec["phase"].strip().lower().startswith("būvdarbi"):
+            continue
+        if rec["authority"] not in AUTHORITIES_WHITELIST:
+            continue
+        if rec["phase"] and rec["phase"] not in PHASE_KEEP:
+            continue
+        if rec["construction_type"] and rec["construction_type"] not in TYPE_KEEP:
             continue
 
-        r["id"] = row_id(r)
-        out.append(r)
-
+        rec["id"] = stable_row_id(rec)
+        out.append(rec)
     return out
 
-
-# --------------- helpers (work on page OR frame) ---------------
-async def try_click(root, selector: str, timeout=2000) -> bool:
-    try:
-        loc = root.locator(selector).first
-        if await loc.count() > 0:
-            await loc.click(timeout=timeout)
-            return True
-    except:
-        pass
-    return False
-
-
-async def set_combobox_by_name(root, name_regex: str, value: str) -> bool:
-    """Type-select option in combobox/textbox by accessible name, under `root` (page or frame)."""
-    try:
-        box = root.get_by_role("combobox", name=re.compile(name_regex, re.I)).first
-        if await box.count() == 0:
-            box = root.get_by_role("textbox", name=re.compile(name_regex, re.I)).first
-        await box.click(timeout=1500)
-        await box.fill("")
-        await box.type(value, delay=25)
-        await root.get_by_role("option", name=value, exact=True).first.click(timeout=2000)
-        return True
-    except:
-        return False
-
-
-async def reset_filters(root):
-    for txt in ["Notīrīt filtrus", "Notīrīt", "Atiestatīt"]:
-        if await try_click(root, f"button:has-text('{txt}')", timeout=1200):
-            await root.wait_for_timeout(300)
-            return
-
-
-async def open_advanced(root):
-    for txt in ["Izvērstā meklēšana", "Izvērstā", "Izvērst"]:
-        if await try_click(root, f"button:has-text('{txt}')", timeout=1200):
-            await root.wait_for_timeout(400)
-            break
-    await try_click(root, "text=Izvērstā meklēšana", timeout=800)
-
-
-async def submit_search(root):
-    for text in ["Meklēt","Atrast","Search"]:
-        if await try_click(root, f"button:has-text('{text}')", timeout=1500):
-            await root.wait_for_timeout(700)
-            return True
-    try:
-        await root.get_by_role("combobox").last.press("Enter")
-        await root.wait_for_timeout(700)
-        return True
-    except:
-        return False
-
-
-async def wait_for_results(root):
-    no_data = ["Nav datu", "Nav atrasts", "Rezultāti nav atrasti", "No data"]
-    for _ in range(30):  # ~15s
-        if await root.locator("table >> tbody >> tr").count() > 0:
-            return "ok"
-        if await root.locator("table tr td").count() > 0:
-            return "ok"
-        for pat in no_data:
-            if await root.get_by_text(re.compile(pat, re.I)).count() > 0:
-                return "empty"
-        await root.wait_for_timeout(500)
-    return "unknown"
-
-
-async def get_search_root(page):
-    # Top level?
-    if await page.get_by_text(re.compile("Ātrā meklēšana|Izvērstā meklēšana|Meklēt")).count() > 0:
+async def find_root(page):
+    """Return the element scope (page or iframe) that contains the table/pager."""
+    if await page.locator("table").count() > 0:
         return page
-    # Look in iframes
-    for frame in page.frames:
+    for fr in page.frames:
         try:
-            if await frame.get_by_text(re.compile("Ātrā meklēšana|Izvērstā meklēšana|Meklēt")).count() > 0:
-                return frame
-        except:
-            continue
-    return page  # fallback
-# --------------------------------------------------------------
-
-
-async def apply_filters(root, authority, phase, ctype, intention, take_debug=False):
-    await reset_filters(root)
-    await open_advanced(root)
-
-    okA = await set_combobox_by_name(root, r"Būvniecības kontroles institūcija", authority)
-    okB = await set_combobox_by_name(root, r"Būvniecības lietas stadija", phase)
-    okC = await set_combobox_by_name(root, r"Būvniecības veids", ctype)
-    okD = await set_combobox_by_name(root, r"Ieceres veids", intention)
-
-    if take_debug:
-        try:
-            await root.page.screenshot(path=str(DEBUG_DIR / "01_after_setting_filters.png"), full_page=True)
+            if await fr.locator("table").count() > 0 or await fr.get_by_text(re.compile("Nākam", re.I)).count() > 0:
+                return fr
         except:
             pass
-
-    submitted = await submit_search(root)
-    state = await wait_for_results(root)
-
-    print(f"[FILTERS] A:{okA} B:{okB} C:{okC} D:{okD} submit:{submitted} state:{state} | "
-          f"{authority} | {phase} | {ctype} | {intention}")
-
-    if take_debug:
-        try:
-            await root.page.screenshot(path=str(DEBUG_DIR / "02_after_search.png"), full_page=True)
-        except:
-            pass
-
-    return state != "empty"
-
+    return page
 
 async def click_next(root) -> bool:
     for sel in [
@@ -241,143 +116,103 @@ async def click_next(root) -> bool:
         "button:has-text('Nākam')",
         "a:has-text('Nākam')",
     ]:
-        if await try_click(root, sel, timeout=1500):
-            await root.wait_for_timeout(500)
-            return True
+        try:
+            loc = root.locator(sel).first
+            if await loc.count() > 0 and await loc.is_enabled():
+                await loc.click(timeout=1500)
+                await root.wait_for_timeout(500)
+                return True
+        except:
+            pass
     return False
 
-
-async def scrape_combo(root, authority, phase, ctype, intention, take_debug=False):
-    has_rows = await apply_filters(root, authority, phase, ctype, intention, take_debug=take_debug)
-    if not has_rows:
-        print(f"[EMPTY] {authority} | {phase} | {ctype} | {intention}")
-        return [], 0
-
-    results, pages = [], 0
-    while pages < MAX_PAGES_PER_COMBO:
-        html = await root.content()
-        rows = parse_table(html)
-        if not rows:
-            break
-        for r in rows:
-            r["authority"] = authority
-            r["phase"] = phase
-            r["construction_type"] = ctype
-            r["intention_type"] = intention
-        results.extend(rows)
-        pages += 1
-        if not await click_next(root):
-            break
-
-    print(f"[OK] {authority} | {phase} | {ctype} | {intention} -> rows:{len(results)} pages:{pages}")
-    return results, pages
-
-
-def safe_load_prev(path: str):
-    p = pathlib.Path(path)
-    if not p.exists() or p.stat().st_size == 0:
+def safe_load_prev(path: pathlib.Path):
+    if not path.exists() or path.stat().st_size == 0:
         return []
     try:
         return pd.read_csv(path, dtype=str).fillna("").to_dict("records")
     except Exception:
         return []
 
-
 async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         ctx = await browser.new_context()
         page = await ctx.new_page()
-        await page.goto(URL, wait_until="domcontentloaded", timeout=180000)
 
+        await page.goto(URL, wait_until="domcontentloaded", timeout=180000)
         # Accept cookies if shown
         for t in ["Apstiprināt", "Apstiprināt visas", "Piekrītu"]:
             try:
-                await page.get_by_text(t, exact=False).first.click(timeout=1500)
+                await page.get_by_text(t, exact=False).first.click(timeout=1200)
                 break
             except:
                 pass
         await page.wait_for_timeout(600)
 
-        root = await get_search_root(page)
+        root = await find_root(page)
 
-        # Build all combos
-        combos = [(a, ph, ct, it) for a in AUTHORITIES for ph in PHASES for ct in TYPES for it in INTENT_TYPES]
-
-        # Smoke mode: run only the first combo (quick diagnosis)
-        if SMOKE and combos:
-            combos = [combos[0]]
-
-        all_rows, total_pages = [], 0
-        first = True
-        for authority, phase, ctype, intention in combos:
-            chunk, walked = await scrape_combo(root, authority, phase, ctype, intention, take_debug=first)
-            first = False
-            all_rows.extend(chunk)
-            total_pages += walked
+        all_rows, pages = [], 0
+        while pages < PAGES_TOTAL:
+            html = await root.content()
+            rows = parse_table(html)
+            all_rows.extend(rows)
+            pages += 1
+            if not await click_next(root):
+                break
 
         await browser.close()
 
-    # Shard mode
-    if SHARD_OUTPUT:
-        df = pd.DataFrame(all_rows)
-        pathlib.Path(SHARD_OUTPUT).parent.mkdir(parents=True, exist_ok=True)
-        df.to_csv(SHARD_OUTPUT, index=False)
-        print(json.dumps({"mode": "shard", "rows": len(all_rows), "pages": total_pages}, ensure_ascii=False))
-        return
+    # Save snapshot + simple changelog (diff vs previous latest)
+    reports = pathlib.Path("reports")
+    reports.mkdir(parents=True, exist_ok=True)
 
-    # Single-job mode
-    os.makedirs("reports", exist_ok=True)
-    prev = safe_load_prev("reports/latest.csv")
-    prev_map = {r.get("id"): r for r in prev}
-    cur_map = {r.get("id"): r for r in all_rows}
+    prev_rows = safe_load_prev(reports / "latest.csv")
+    prev_map = {r.get("id"): r for r in prev_rows}
+    cur_map  = {}
+    for r in all_rows:
+        cur_map[r.get("id")] = r  # de-dup across pages
 
     new_ids = [i for i in cur_map if i not in prev_map]
     gone_ids = [i for i in prev_map if i not in cur_map]
     changed = []
     for i in set(prev_map).intersection(cur_map):
         a, b = prev_map[i], cur_map[i]
-        fields = [k for k in ["phase","construction_type","intention_type","address","object"] if (a.get(k,"") != b.get(k,""))]
-        if fields:
-            changed.append({"id": i, "fields": fields, "before": a, "after": b})
+        diffs = [k for k in ["phase","construction_type","address","object"] if (a.get(k,"") != b.get(k,""))]
+        if diffs:
+            changed.append({"id": i, "fields": diffs, "before": a, "after": b})
 
     df = pd.DataFrame(list(cur_map.values()))
-    df.to_csv("reports/latest.csv", index=False)
+    df.to_csv(reports / "latest.csv", index=False)
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    df.to_csv(f"reports/{today}.csv", index=False)
+    df.to_csv(reports / f"{today}.csv", index=False)
 
     lines = [
-        f"# BIS Plānotie būvdarbi — izmaiņu atskaite ({datetime.now().strftime('%Y-%m-%d %H:%M')})",
+        f"# BIS plānotie darbi — momentuzņēmums ({datetime.now().strftime('%Y-%m-%d %H:%M')})",
         "",
-        f"- Kopā rindas: {len(cur_map)}",
-        f"- Jauni: {len(new_ids)}",
+        f"- Pārlapotas lapas: {pages}",
+        f"- Rindas pēc filtriem (unikālas): {len(cur_map)}",
+        f"- Jauni iepr. salīdzinājumā: {len(new_ids)}",
+        f"- Izmainīti: {len(changed)}",
         f"- Noņemti: {len(gone_ids)}",
-        f"- Atjaunināti: {len(changed)}",
-        f"- Lapu limits vienai kombinācijai: {MAX_PAGES_PER_COMBO}",
-        f"- Faktiski pārlapotas lapas: {total_pages}",
         "",
         "## Jaunie",
     ]
     for i in new_ids:
         r = cur_map[i]
-        lines += [
+        lines.append(
             f"- **{r.get('authority','?')}** — {r.get('bis_number','?')} — {r.get('address','?')} — {r.get('object','?')} — "
-            f"{r.get('phase','?')} — {r.get('construction_type','?')} — {r.get('intention_type','?')}  "
-            + (f"[Saite]({r.get('details_url')})" if r.get('details_url') else "")
-        ]
-    lines += ["", "## Atjaunināti"]
+            f"{r.get('phase','?')} — {r.get('construction_type','?')}  " + (f"[Saite]({r.get('details_url')})" if r.get('details_url') else "")
+        )
+    lines += ["", "## Izmainīti"]
     for ch in changed:
         before, after = ch["before"], ch["after"]
-        lines += [f"- **{after.get('authority','?')}** — {after.get('bis_number','?')}** — {after.get('address','?')} — {after.get('object','?')}"]
+        lines.append(f"- **{after.get('authority','?')}** — {after.get('bis_number','?')} — {after.get('address','?')} — {after.get('object','?')}")
         for f in ch["fields"]:
-            lines += [f"  - {f}: `{before.get(f,'')}` → `{after.get(f,'')}`"]
-    lines += ["", "## Noņemti (ID)"] + [f"- {i}" for i in gone_ids]
+            lines.append(f"  - {f}: `{before.get(f,'')}` → `{after.get(f,'')}`")
 
-    with open("reports/CHANGELOG.md", "w", encoding="utf-8") as f:
-        f.write("\n".join(lines))
-
-    print(json.dumps({"mode": "full", "rows": len(cur_map), "pages": total_pages}, ensure_ascii=False))
-
+    (reports / "CHANGELOG.md").write_text("\n".join(lines), encoding="utf-8")
+    print({"pages": pages, "rows_unique": len(cur_map)})
 
 if __name__ == "__main__":
     asyncio.run(main())
