@@ -1,11 +1,11 @@
-# BIS Plānotie būvdarbi — izmaiņu atskaite (2025-10-08 05:11)
+# BIS plānotie darbi — momentuzņēmums (2025-10-10 06:25)
 
-- Jauni ieraksti: 0
-- Noņemti (vairs neatbilst filtriem vai pazuduši): 0
-- Atjaunināti: 0
+- Pārlapotas lapas: 1
+- Rindas pēc filtriem (unikālas): 0
+- Jauni iepr. salīdzinājumā: 0
+- Izmainīti: 0
+- Noņemti: 0
 
 ## Jaunie
 
-## Atjaunināti
-
-## Noņemti (ID)
+## Izmainīti
