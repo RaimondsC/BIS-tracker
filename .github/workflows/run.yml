@@ -1,8 +1,8 @@
-name: BIS Tracker (delta-only, HTML email)
+name: BIS Tracker (delta + full HTML)
 
 on:
   schedule:
-    - cron: "0 3 * * 1"   # Mondays ~06:00 Riga summer / ~05:00 winter (as before)
+    - cron: "0 3 * * 1"   # Mondays ~06:00 Riga summer / ~05:00 winter
   workflow_dispatch: {}
 
 jobs:
@@ -20,14 +20,15 @@ jobs:
           python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      - name: Scrape (direct URL pagination; delta-only output)
+      - name: Scrape (direct URL pagination)
         env:
-          PAGES_TOTAL: "5000"       # you can lower/raise anytime
-          PAGE_DELAY_MS: "25"       # courtesy; set "0" if you want max speed
+          PAGES_TOTAL: "5000"          # raise/lower freely
+          PAGE_DELAY_MS: "25"          # set "0" for max speed
+          EMPTY_PAGE_TOLERANCE: "3"    # consecutive empty pages before stopping
         run: |
           python scraper.py
 
-      - name: Upload debug HTML (first 2 pages)
+      - name: Upload debug HTML (first pages + empties)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -35,27 +36,31 @@ jobs:
           path: debug
           if-no-files-found: ignore
 
-      - name: Commit state + report
+      - name: Commit state + reports
         run: |
           git config user.name "bis-bot"
           git config user.email "bis-bot@users.noreply.github.com"
-          git add state/state.json reports/report.html || true
-          git commit -m "Snapshot & delta: $(date -u +'%Y-%m-%d %H:%M')" || echo "Nothing to commit"
+          git add state/state.json reports/report_*.html || true
+          git commit -m "Snapshot & reports: $(date -u +'%Y-%m-%d %H:%M')" || echo "Nothing to commit"
           git push
 
-      - name: Email report (HTML only)
+      - name: Email reports (HTML only)
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.SMTP_SERVER }}   # smtp.gmail.com
           server_port: ${{ secrets.SMTP_PORT }}        # 587
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: BIS tracker — izmaiņu atskaite ${{ github.run_id }}
+          subject: BIS tracker — atskaite ${{ github.run_id }}
           to: ${{ secrets.MAIL_TO }}
           from: ${{ secrets.MAIL_FROM }}
-          secure: false            # 587 with STARTTLS (no starttls key)
+          secure: false            # 587 with STARTTLS (no 'starttls' key)
           html_body: |
-            <p>Sveiki! Pielikumā šī skrējiena <strong>izmaiņu</strong> atskaite (tikai jauni / stadijas izmaiņas).</p>
-            <p>Ja pielikums nav atvērts, to var apskatīt arī repozitorijā: <code>reports/report.html</code>.</p>
+            <p>Sveiki! Pievienotas atskaites:</p>
+            <ul>
+              <li><code>report_delta.html</code> – tikai jauni ieraksti un stadiju izmaiņas</li>
+              <li><code>report_full.html</code> – pilns momentuzņēmums (visi atlasītie ieraksti)</li>
+            </ul>
           attachments: |
-            reports/report.html
+            reports/report_delta.html
+            reports/report_full.html
