@@ -1,22 +1,29 @@
-import os, pathlib, hashlib, re, collections
+import os, pathlib, hashlib, re, json, collections
 from datetime import datetime
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright, TimeoutError
 import pandas as pd
 
-# ------------------------- CONSTANTS -------------------------
+# ===================== CONFIG =====================
 BASE = "https://bis.gov.lv"
 LIST_URL = BASE + "/bisp/lv/planned_constructions/list?page={page}"
 
-# Pages to fetch (1..N). You can override in workflow env (PAGES_TOTAL)
-PAGES_TOTAL = int(os.getenv("PAGES_TOTAL", "300"))
+# How many list pages to scan this run (override in the workflow's env)
+PAGES_TOTAL = int(os.getenv("PAGES_TOTAL", "5000"))
 
-DEBUG_DIR = pathlib.Path("debug"); DEBUG_DIR.mkdir(parents=True, exist_ok=True)
-REPORTS = pathlib.Path("reports"); REPORTS.mkdir(parents=True, exist_ok=True)
+# Optional politeness delay between pages (milliseconds). 0 = no delay.
+PAGE_DELAY_MS = int(os.getenv("PAGE_DELAY_MS", "25"))
+
+# Folders
+ROOT = pathlib.Path(".")
+DEBUG_DIR = ROOT / "debug"; DEBUG_DIR.mkdir(exist_ok=True)
+REPORTS = ROOT / "reports"; REPORTS.mkdir(parents=True, exist_ok=True)
+STATE_DIR = ROOT / "state"; STATE_DIR.mkdir(parents=True, exist_ok=True)
+STATE_FILE = STATE_DIR / "state.json"
 
 # Your filters (we normalize values before comparing)
 AUTHORITIES_WHITELIST = {
-    "RĪGAS VALSTSPILSĒTAS PAŠVALDĪBAS PILSĒTAS ATTĪSTĪBAS DEPARTAMENTS",
+    "RĪGAS VALSTSPILSĪTAS PAŠVALDĪBAS PILSĒTAS ATTĪSTĪBAS DEPARTAMENTS",
     "Ādažu novada būvvalde",
     "Saulkrastu novada būvvalde",
     "Ropažu novada pašvaldības būvvalde",
@@ -44,7 +51,7 @@ TYPE_KEEP = {
     "Vienkāršota pārbūve",
 }
 
-# Header labels used in the /list?page=N blocks
+# List header labels as emitted on /list?page=N
 HEADER_MAP = {
     "Būvniecības kontroles institūcija": "authority",
     "Lietas numurs": "bis_number",
@@ -53,39 +60,27 @@ HEADER_MAP = {
     "Būvniecības veids": "construction_type",
     "Būvniecības lietas stadija": "phase",
 }
-# -------------------------------------------------------------
+# ===================================================
 
 
-# ------------------------- NORMALIZATION -------------------------
+# ===================== NORMALIZATION =====================
 NBSP = "\u00A0"
-
 def norm(s: str) -> str:
-    """Normalize text for robust equality: replace NBSP, collapse spaces, strip."""
-    if s is None:
-        return ""
+    if s is None: return ""
     s = s.replace(NBSP, " ")
     s = re.sub(r"\s+", " ", s)
     return s.strip()
 
-# Pre-normalize filters once
 AUTHORITIES_NORM = {norm(a): a for a in AUTHORITIES_WHITELIST}
 PHASE_KEEP_NORM   = {norm(x) for x in PHASE_KEEP}
 TYPE_KEEP_NORM    = {norm(x) for x in TYPE_KEEP}
-# ---------------------------------------------------------------
+# ========================================================
 
 
-# ------------------------- PARSING -------------------------
-def stable_row_id(r: dict) -> str:
-    """Prefer BIS number; otherwise hash a few stable fields."""
-    if r.get("bis_number"):
-        return f"bis:{r['bis_number']}"
-    key = "|".join(str(r.get(k, "")) for k in ["authority","address","object","phase","construction_type"])
-    return "h:" + hashlib.sha256(key.encode("utf-8")).hexdigest()[:16]
-
+# ===================== PARSING =====================
 def extract_value(cell, header_text: str) -> str:
     """
-    Values in .flextable__value also include a screen-reader label like 'Label: Value'.
-    Strip 'Label:' prefix so we keep only the value.
+    Values include a screen-reader prefix 'Label: Value'. Strip 'Label:'.
     """
     val_el = cell.select_one(".flextable__value")
     t = norm(val_el.get_text(" ", strip=True) if val_el else "")
@@ -96,10 +91,8 @@ def extract_value(cell, header_text: str) -> str:
 
 def parse_page(html: str):
     """
-    Return (total_rows_on_page, matched_rows_list, diag Counter by authority).
-    - total_rows_on_page: count of .flextable__row on the page (even if later filtered out)
-    - matched_rows_list: rows that pass all filters
-    - diag: diagnostic counts by authority (normalized), for visibility in logs
+    Return (total_rows_on_page, parsed_rows, diag Counter by authority).
+    'parsed_rows' ARE NOT filtered yet.
     """
     soup = BeautifulSoup(html, "lxml")
     row_nodes = soup.select(".flextable__row")
@@ -125,61 +118,130 @@ def parse_page(html: str):
                 text = norm(a.get_text(" ", strip=True))
             rec[key] = text
 
-        auth_n = norm(rec.get("authority"))
-        if auth_n:
-            diag[auth_n] += 1
+        if rec.get("authority"):
+            diag[norm(rec["authority"])] += 1
 
-        # Apply normalized filters
-        if auth_n not in AUTHORITIES_NORM:
-            continue
-        phase_n = norm(rec.get("phase"))
-        if phase_n and phase_n not in PHASE_KEEP_NORM:
-            continue
-        type_n = norm(rec.get("construction_type"))
-        if type_n and type_n not in TYPE_KEEP_NORM:
-            continue
+        # Every row must have a key; prefer BIS number
+        rec["_key"] = rec.get("bis_number") or hashlib.sha256(
+            "|".join([rec.get("authority",""), rec.get("address",""), rec.get("object","")]).encode("utf-8")
+        ).hexdigest()[:24]
 
-        # Keep canonical authority label & normalized values
-        rec["authority"] = AUTHORITIES_NORM.get(auth_n, rec.get("authority"))
-        rec["phase"] = phase_n
-        rec["construction_type"] = type_n
-
-        rec["id"] = stable_row_id(rec)
         out.append(rec)
 
     return total_rows, out, diag
-# -----------------------------------------------------------
+# ===================================================
 
 
-# ------------------------- REPORTS -------------------------
-def make_html_report(rows: list[dict], pages_seen: int, scanned: int) -> str:
-    # Build a clean HTML table with clickable BIS numbers
+# ===================== FILTER + DIFF =====================
+def filter_row(rec: dict) -> bool:
+    auth_n = norm(rec.get("authority"))
+    if auth_n not in AUTHORITIES_NORM:
+        return False
+    phase_n = norm(rec.get("phase"))
+    if phase_n and phase_n not in PHASE_KEEP_NORM:
+        return False
+    type_n = norm(rec.get("construction_type"))
+    if type_n and type_n not in TYPE_KEEP_NORM:
+        return False
+    return True
+
+def load_state() -> dict:
+    if STATE_FILE.exists():
+        return json.loads(STATE_FILE.read_text(encoding="utf-8"))
+    return {}
+
+def save_state(state: dict):
+    STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+
+def compute_delta(prev_state: dict, filtered_rows: list[dict]):
+    """
+    Returns (delta_rows, updated_state, baseline_flag)
+    - delta_rows: only NEW or CHANGED (phase) rows to report
+    - updated_state: merged state after this run
+    - baseline_flag: True if this is the very first run (no previous state); we suppress email content then
+    """
+    baseline = (len(prev_state) == 0)
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    updated = dict(prev_state)  # shallow copy
+    delta = []
+
+    for r in filtered_rows:
+        key = r["_key"]
+        auth_n = norm(r.get("authority"))
+        phase_n = norm(r.get("phase"))
+        type_n  = norm(r.get("construction_type"))
+
+        canon_authority = AUTHORITIES_NORM.get(auth_n, r.get("authority"))
+        current = {
+            "bis_number": r.get("bis_number",""),
+            "authority": canon_authority or "",
+            "address": r.get("address",""),
+            "object": r.get("object",""),
+            "phase": phase_n,
+            "construction_type": type_n,
+            "details_url": r.get("details_url",""),
+            "last_seen": today,
+        }
+
+        old = updated.get(key)
+        if old is None:
+            # brand new record
+            if not baseline:  # don't spam on the very first run
+                tag = "Jauns"
+                delta.append({**current, "_key": key, "_change": tag})
+            updated[key] = {**current, "first_seen": today}
+        else:
+            # seen before: check phase change
+            if old.get("phase") != phase_n:
+                tag = f"Stadija: {old.get('phase','?')} → {phase_n or '?'}"
+                delta.append({**current, "_key": key, "_change": tag})
+            # update stored snapshot
+            updated[key] = {
+                **old,
+                **current,
+                "first_seen": old.get("first_seen", today)
+            }
+
+    return delta, updated, baseline
+# =========================================================
+
+
+# ===================== REPORT (HTML only) =====================
+def make_html_report(rows: list[dict], pages_seen: int, scanned: int, baseline: bool) -> str:
+    if baseline:
+        intro = "<p><em>Šis ir bāzes skrējiens.</em> Nākamajā reizē tiks rādīti tikai jauni ieraksti un ieraksti ar stadijas izmaiņām.</p>"
+    else:
+        intro = ""
+
     if not rows:
-        body = "<p>Nav ierakstu, kas atbilst filtriem.</p>"
+        body = "<p>Nav jaunu vai mainītu ierakstu.</p>"
     else:
         df = pd.DataFrame(rows)[[
-            "bis_number", "authority", "address", "object", "phase", "construction_type", "details_url"
+            "bis_number", "authority", "address", "object", "phase", "construction_type", "details_url", "_change"
         ]].copy()
+
         df["BIS lieta"] = df.apply(
             lambda r: (f'<a href="{r["details_url"]}" target="_blank" rel="noopener">{r["bis_number"]}</a>'
                        if r.get("details_url") and r.get("bis_number") else (r.get("bis_number",""))),
             axis=1
         )
         df.rename(columns={
+            "_change": "Izmaiņas",
             "authority": "Būvniecības kontroles institūcija",
             "address": "Adrese",
             "object": "Būves nosaukums",
             "phase": "Būvniecības lietas stadija",
             "construction_type": "Būvniecības veids",
         }, inplace=True)
-        df = df[["BIS lieta", "Būvniecības kontroles institūcija", "Adrese", "Būves nosaukums",
-                 "Būvniecības lietas stadija", "Būvniecības veids"]]
+        df = df[["Izmaiņas","BIS lieta","Būvniecības kontroles institūcija","Adrese","Būves nosaukums",
+                 "Būvniecības lietas stadija","Būvniecības veids"]]
         body = df.to_html(index=False, escape=False)
 
     meta = f"""
     <p><strong>Pārlapotas lapas:</strong> {pages_seen} &nbsp;|&nbsp;
        <strong>Rindas skenētas kopā:</strong> {scanned} &nbsp;|&nbsp;
-       <strong>Atlasīto ierakstu skaits:</strong> {len(rows)}</p>
+       <strong>Ziņojamo ierakstu skaits:</strong> {len(rows)}</p>
     """
     css = """
     <style>
@@ -191,104 +253,23 @@ def make_html_report(rows: list[dict], pages_seen: int, scanned: int) -> str:
     </style>
     """
     return f"""<!doctype html><meta charset="utf-8"><title>BIS atskaite</title>{css}
-    <h1>BIS plānoto būvniecību atskaite</h1>
+    <h1>BIS plānoto būvniecību izmaiņu atskaite</h1>
     <p><small>{datetime.now().strftime('%Y-%m-%d %H:%M')}</small></p>
     {meta}
+    {intro}
     {body}
     """
-
-def make_docx_report(rows: list[dict], outfile: pathlib.Path):
-    from docx import Document
-    from docx.shared import Pt
-    from docx.oxml.ns import qn as _qn
-    from docx.oxml import OxmlElement
-
-    doc = Document()
-    doc.styles['Normal'].font.name = 'Calibri'
-    doc.styles['Normal'].font.size = Pt(10)
-    doc.add_heading('BIS plānoto būvniecību atskaite', level=1)
-
-    if not rows:
-        doc.add_paragraph("Nav ierakstu, kas atbilst filtriem.")
-        doc.save(str(outfile))
-        return
-
-    cols = ["BIS lieta", "Būvniecības kontroles institūcija", "Adrese",
-            "Būves nosaukums", "Būvniecības lietas stadija", "Būvniecības veids"]
-    table = doc.add_table(rows=1, cols=len(cols))
-    hdr = table.rows[0].cells
-    for i,c in enumerate(cols): hdr[i].text = c
-
-    def add_hyperlink(cell_paragraph, url, text):
-        part = cell_paragraph.part
-        r_id = part.relate_to(url,
-                              reltype="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink",
-                              is_external=True)
-        hyperlink = OxmlElement('w:hyperlink')
-        hyperlink.set(_qn('r:id'), r_id)
-        new_run = OxmlElement('w:r')
-        rPr = OxmlElement('w:rPr')
-        rStyle = OxmlElement('w:rStyle')
-        rStyle.set(_qn('w:val'), 'Hyperlink')
-        rPr.append(rStyle)
-        new_run.append(rPr)
-        t = OxmlElement('w:t'); t.text = text
-        new_run.append(t)
-        hyperlink.append(new_run)
-        cell_paragraph._p.append(hyperlink)
-
-    for r in rows:
-        row = table.add_row().cells
-        # BIS lieta with link
-        cell0 = row[0].paragraphs[0]
-        if r.get("details_url") and r.get("bis_number"):
-            add_hyperlink(cell0, r["details_url"], r["bis_number"])
-        else:
-            cell0.add_run(r.get("bis_number",""))
-        row[1].text = r.get("authority","")
-        row[2].text = r.get("address","")
-        row[3].text = r.get("object","")
-        row[4].text = r.get("phase","")
-        row[5].text = r.get("construction_type","")
-
-    doc.save(str(outfile))
-
-def save_reports(rows: list[dict], pages_seen: int, scanned: int, diag_accum: collections.Counter):
-    # CSV (Excel-friendly, Latvian-safe)
-    df = pd.DataFrame(rows)
-    if not df.empty:
-        df.drop_duplicates(subset=["id"], inplace=True)
-    df.to_csv(REPORTS / "latest.csv", index=False, encoding="utf-8-sig")
-    today = datetime.now().strftime("%Y-%m-%d")
-    df.to_csv(REPORTS / f"{today}.csv", index=False, encoding="utf-8-sig")
-
-    # CHANGELOG (simple)
-    (REPORTS / "CHANGELOG.md").write_text(
-        "# Snapshot {}\n\n- Pārlapotas lapas: {}\n- Rindas skenētas kopā: {}\n- Rindas pēc filtriem (unikālas): {}\n".format(
-        datetime.now().strftime("%Y-%m-%d %H:%M"), pages_seen, scanned, 0 if df.empty else len(df)),
-        encoding="utf-8"
-    )
-
-    # HTML
-    html = make_html_report(rows, pages_seen, scanned)
-    (REPORTS / "report.html").write_text(html, encoding="utf-8")
-
-    # DOCX (best-effort)
-    try:
-        make_docx_report(rows, REPORTS / "report.docx")
-    except Exception as e:
-        (REPORTS / "report.docx.error.txt").write_text(str(e), encoding="utf-8")
-# -----------------------------------------------------------
+# ============================================================
 
 
-# ------------------------- MAIN -------------------------
+# ===================== MAIN =====================
 async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         ctx = await browser.new_context()
         page = await ctx.new_page()
 
-        all_rows = []
+        all_parsed = []
         total_scanned = 0
         pages_fetched = 0
         diag_all = collections.Counter()
@@ -310,31 +291,54 @@ async def main():
             except:
                 pass
 
-            await page.wait_for_timeout(250)
+            await page.wait_for_timeout(200)
             html = await page.content()
 
             if n <= 2:
                 (DEBUG_DIR / f"page-{n}.html").write_text(html, encoding="utf-8")
 
-            total_rows, matched, diag = parse_page(html)
+            total_rows, parsed_rows, diag = parse_page(html)
             pages_fetched += 1
             total_scanned += total_rows
             diag_all.update(diag)
 
-            # Only stop at true end-of-list (no rows at all)
-            if total_rows == 0:
+            if total_rows == 0:  # true end-of-list
                 break
 
-            all_rows.extend(matched)
+            all_parsed.extend(parsed_rows)
+
+            if PAGE_DELAY_MS > 0:
+                await page.wait_for_timeout(PAGE_DELAY_MS)
 
         await browser.close()
 
-    save_reports(all_rows, pages_fetched, total_scanned, diag_all)
+    # Apply filters on parsed rows
+    filtered = []
+    for r in all_parsed:
+        if filter_row(r):
+            # canonicalize authority & normalized values for output
+            auth_n = norm(r.get("authority"))
+            r["authority"] = AUTHORITIES_NORM.get(auth_n, r.get("authority"))
+            r["phase"] = norm(r.get("phase"))
+            r["construction_type"] = norm(r.get("construction_type"))
+            filtered.append(r)
+
+    # Delta vs previous state
+    prev_state = load_state()
+    delta_rows, updated_state, baseline = compute_delta(prev_state, filtered)
+    save_state(updated_state)
+
+    # HTML report (only delta)
+    html = make_html_report(delta_rows, pages_fetched, total_scanned, baseline)
+    (REPORTS / "report.html").write_text(html, encoding="utf-8")
+
+    # Useful log line
     print({
         "pages": pages_fetched,
         "rows_scanned": total_scanned,
-        "rows_matched": len(all_rows),
-        "top_authorities_seen": diag_all.most_common(5),
+        "rows_matched_now": len(filtered),
+        "rows_reported_delta": len(delta_rows),
+        "baseline": baseline
     })
 
 if __name__ == "__main__":
