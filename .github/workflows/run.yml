@@ -24,7 +24,7 @@ jobs:
         env:
           PAGES_TOTAL: "5000"          # raise/lower freely
           PAGE_DELAY_MS: "25"          # set "0" for max speed
-          EMPTY_PAGE_TOLERANCE: "3"    # consecutive empty pages before stopping
+          EMPTY_PAGE_TOLERANCE: "10"    # consecutive empty pages before stopping
         run: |
           python scraper.py
 
