@@ -6,15 +6,19 @@ import pandas as pd
 
 # ===================== CONFIG =====================
 BASE = "https://bis.gov.lv"
-LIST_URL = BASE + "/bisp/lv/planned_constructions/list?page={page}"
+# Explicitly match the UI sort: case number DESC (stable long list)
+LIST_URL = BASE + "/bisp/lv/planned_constructions/list?order=case_number&direction=desc&page={page}"
 
-# How many list pages to scan this run (override in the workflow's env)
+# How many list pages to scan this run (override in workflow env)
 PAGES_TOTAL = int(os.getenv("PAGES_TOTAL", "5000"))
 
-# Optional politeness delay between pages (milliseconds). 0 = no delay.
+# Politeness delay between pages in milliseconds (0 = none)
 PAGE_DELAY_MS = int(os.getenv("PAGE_DELAY_MS", "25"))
 
-# Folders
+# Stop only after this many consecutive empty pages (network hiccups or gaps)
+EMPTY_PAGE_TOLERANCE = int(os.getenv("EMPTY_PAGE_TOLERANCE", "3"))
+
+# Folders/files
 ROOT = pathlib.Path(".")
 DEBUG_DIR = ROOT / "debug"; DEBUG_DIR.mkdir(exist_ok=True)
 REPORTS = ROOT / "reports"; REPORTS.mkdir(parents=True, exist_ok=True)
@@ -51,7 +55,7 @@ TYPE_KEEP = {
     "Vienkāršota pārbūve",
 }
 
-# List header labels as emitted on /list?page=N
+# Column labels seen on /list?page=N
 HEADER_MAP = {
     "Būvniecības kontroles institūcija": "authority",
     "Lietas numurs": "bis_number",
@@ -92,7 +96,7 @@ def extract_value(cell, header_text: str) -> str:
 def parse_page(html: str):
     """
     Return (total_rows_on_page, parsed_rows, diag Counter by authority).
-    'parsed_rows' ARE NOT filtered yet.
+    'parsed_rows' are NOT filtered yet.
     """
     soup = BeautifulSoup(html, "lxml")
     row_nodes = soup.select(".flextable__row")
@@ -121,7 +125,7 @@ def parse_page(html: str):
         if rec.get("authority"):
             diag[norm(rec["authority"])] += 1
 
-        # Every row must have a key; prefer BIS number
+        # Make a stable key; prefer BIS number
         rec["_key"] = rec.get("bis_number") or hashlib.sha256(
             "|".join([rec.get("authority",""), rec.get("address",""), rec.get("object","")]).encode("utf-8")
         ).hexdigest()[:24]
@@ -158,12 +162,11 @@ def compute_delta(prev_state: dict, filtered_rows: list[dict]):
     Returns (delta_rows, updated_state, baseline_flag)
     - delta_rows: only NEW or CHANGED (phase) rows to report
     - updated_state: merged state after this run
-    - baseline_flag: True if this is the very first run (no previous state); we suppress email content then
+    - baseline_flag: True if this is the very first run (no previous state)
     """
     baseline = (len(prev_state) == 0)
     today = datetime.now().strftime("%Y-%m-%d")
-
-    updated = dict(prev_state)  # shallow copy
+    updated = dict(prev_state)
     delta = []
 
     for r in filtered_rows:
@@ -186,17 +189,13 @@ def compute_delta(prev_state: dict, filtered_rows: list[dict]):
 
         old = updated.get(key)
         if old is None:
-            # brand new record
-            if not baseline:  # don't spam on the very first run
-                tag = "Jauns"
-                delta.append({**current, "_key": key, "_change": tag})
+            if not baseline:
+                delta.append({**current, "_key": key, "_change": "Jauns"})
             updated[key] = {**current, "first_seen": today}
         else:
-            # seen before: check phase change
             if old.get("phase") != phase_n:
                 tag = f"Stadija: {old.get('phase','?')} → {phase_n or '?'}"
                 delta.append({**current, "_key": key, "_change": tag})
-            # update stored snapshot
             updated[key] = {
                 **old,
                 **current,
@@ -207,42 +206,42 @@ def compute_delta(prev_state: dict, filtered_rows: list[dict]):
 # =========================================================
 
 
-# ===================== REPORT (HTML only) =====================
-def make_html_report(rows: list[dict], pages_seen: int, scanned: int, baseline: bool) -> str:
-    if baseline:
-        intro = "<p><em>Šis ir bāzes skrējiens.</em> Nākamajā reizē tiks rādīti tikai jauni ieraksti un ieraksti ar stadijas izmaiņām.</p>"
-    else:
-        intro = ""
-
+# ===================== REPORTS (HTML) =====================
+def html_table_from_rows(rows: list[dict], include_change_col: bool) -> str:
     if not rows:
-        body = "<p>Nav jaunu vai mainītu ierakstu.</p>"
-    else:
-        df = pd.DataFrame(rows)[[
-            "bis_number", "authority", "address", "object", "phase", "construction_type", "details_url", "_change"
-        ]].copy()
+        return "<p>Nav datu.</p>"
+    cols = ["bis_number","authority","address","object","phase","construction_type","details_url"]
+    if include_change_col:
+        cols = ["_change"] + cols
+    df = pd.DataFrame(rows)[cols].copy()
 
-        df["BIS lieta"] = df.apply(
-            lambda r: (f'<a href="{r["details_url"]}" target="_blank" rel="noopener">{r["bis_number"]}</a>'
-                       if r.get("details_url") and r.get("bis_number") else (r.get("bis_number",""))),
-            axis=1
-        )
-        df.rename(columns={
-            "_change": "Izmaiņas",
-            "authority": "Būvniecības kontroles institūcija",
-            "address": "Adrese",
-            "object": "Būves nosaukums",
-            "phase": "Būvniecības lietas stadija",
-            "construction_type": "Būvniecības veids",
-        }, inplace=True)
+    def linkify(r):
+        if r.get("details_url") and r.get("bis_number"):
+            return f'<a href="{r["details_url"]}" target="_blank" rel="noopener">{r["bis_number"]}</a>'
+        return r.get("bis_number","")
+
+    df["BIS lieta"] = df.apply(linkify, axis=1)
+
+    rename = {
+        "authority": "Būvniecības kontroles institūcija",
+        "address": "Adrese",
+        "object": "Būves nosaukums",
+        "phase": "Būvniecības lietas stadija",
+        "construction_type": "Būvniecības veids",
+        "_change": "Izmaiņas",
+    }
+
+    if include_change_col:
         df = df[["Izmaiņas","BIS lieta","Būvniecības kontroles institūcija","Adrese","Būves nosaukums",
-                 "Būvniecības lietas stadija","Būvniecības veids"]]
-        body = df.to_html(index=False, escape=False)
+                 "Būvniecības lietas stadija","Būvniecības veids"]].rename(columns={}, inplace=False)
+    else:
+        df = df[["BIS lieta","Būvniecības kontroles institūcija","Adrese","Būves nosaukums",
+                 "Būvniecības lietas stadija","Būvniecības veids"]].rename(columns={}, inplace=False)
 
-    meta = f"""
-    <p><strong>Pārlapotas lapas:</strong> {pages_seen} &nbsp;|&nbsp;
-       <strong>Rindas skenētas kopā:</strong> {scanned} &nbsp;|&nbsp;
-       <strong>Ziņojamo ierakstu skaits:</strong> {len(rows)}</p>
-    """
+    df.rename(columns=rename, inplace=True, errors="ignore")
+    return df.to_html(index=False, escape=False)
+
+def wrap_html(title: str, body_html: str, pages_seen: int, scanned: int, extra_note: str = "") -> str:
     css = """
     <style>
       body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; padding:16px;}
@@ -252,12 +251,16 @@ def make_html_report(rows: list[dict], pages_seen: int, scanned: int, baseline: 
       a{ text-decoration:none; }
     </style>
     """
-    return f"""<!doctype html><meta charset="utf-8"><title>BIS atskaite</title>{css}
-    <h1>BIS plānoto būvniecību izmaiņu atskaite</h1>
+    meta = f"""
+    <p><strong>Pārlapotas lapas:</strong> {pages_seen} &nbsp;|&nbsp;
+       <strong>Rindas skenētas kopā:</strong> {scanned}</p>
+    """
+    return f"""<!doctype html><meta charset="utf-8"><title>{title}</title>{css}
+    <h1>{title}</h1>
     <p><small>{datetime.now().strftime('%Y-%m-%d %H:%M')}</small></p>
     {meta}
-    {intro}
-    {body}
+    {('<p><em>'+extra_note+'</em></p>' if extra_note else '')}
+    {body_html}
     """
 # ============================================================
 
@@ -272,13 +275,20 @@ async def main():
         all_parsed = []
         total_scanned = 0
         pages_fetched = 0
-        diag_all = collections.Counter()
+        consecutive_empty = 0
 
         for n in range(1, PAGES_TOTAL + 1):
             url = LIST_URL.format(page=n)
             try:
+                # domcontentloaded + a short wait for rows to render
                 await page.goto(url, wait_until="domcontentloaded", timeout=180000)
+                try:
+                    # Wait for either rows or a small timeout (some pages render very fast)
+                    await page.wait_for_selector(".flextable__row", timeout=2500)
+                except TimeoutError:
+                    pass
             except TimeoutError:
+                # Retry once if navigation timed out
                 await page.goto(url, wait_until="domcontentloaded", timeout=180000)
 
             # Accept cookies if shown
@@ -297,15 +307,20 @@ async def main():
             if n <= 2:
                 (DEBUG_DIR / f"page-{n}.html").write_text(html, encoding="utf-8")
 
-            total_rows, parsed_rows, diag = parse_page(html)
+            total_rows, parsed_rows, _ = parse_page(html)
             pages_fetched += 1
             total_scanned += total_rows
-            diag_all.update(diag)
 
-            if total_rows == 0:  # true end-of-list
-                break
-
-            all_parsed.extend(parsed_rows)
+            if total_rows == 0:
+                consecutive_empty += 1
+                # Save the first few empties for diagnostics
+                if consecutive_empty <= EMPTY_PAGE_TOLERANCE:
+                    (DEBUG_DIR / f"page-{n}-EMPTY.html").write_text(html, encoding="utf-8")
+                if consecutive_empty >= EMPTY_PAGE_TOLERANCE:
+                    break
+            else:
+                consecutive_empty = 0
+                all_parsed.extend(parsed_rows)
 
             if PAGE_DELAY_MS > 0:
                 await page.wait_for_timeout(PAGE_DELAY_MS)
@@ -313,7 +328,7 @@ async def main():
         await browser.close()
 
     # Apply filters on parsed rows
-    filtered = []
+    filtered_map = {}
     for r in all_parsed:
         if filter_row(r):
             # canonicalize authority & normalized values for output
@@ -321,24 +336,35 @@ async def main():
             r["authority"] = AUTHORITIES_NORM.get(auth_n, r.get("authority"))
             r["phase"] = norm(r.get("phase"))
             r["construction_type"] = norm(r.get("construction_type"))
-            filtered.append(r)
+            filtered_map[r["_key"]] = r  # de-dup by key
+    filtered = list(filtered_map.values())
 
     # Delta vs previous state
     prev_state = load_state()
     delta_rows, updated_state, baseline = compute_delta(prev_state, filtered)
     save_state(updated_state)
 
-    # HTML report (only delta)
-    html = make_html_report(delta_rows, pages_fetched, total_scanned, baseline)
-    (REPORTS / "report.html").write_text(html, encoding="utf-8")
+    # Build BOTH reports (delta + full)
+    delta_html = html_table_from_rows(delta_rows, include_change_col=True)
+    full_html  = html_table_from_rows(filtered,   include_change_col=False)
+
+    title_delta = "BIS – izmaiņu atskaite (jauni + stadijas izmaiņas)"
+    note = "Šis ir bāzes skrējiens. Izmaiņu saraksts tiks sūtīts no nākamā skrējiena." if baseline else ""
+    delta_doc = wrap_html(title_delta, delta_html, pages_fetched, total_scanned, extra_note=note)
+    (REPORTS / "report_delta.html").write_text(delta_doc, encoding="utf-8")
+
+    title_full = "BIS – pilns momentuzņēmums (atlasītie ieraksti)"
+    full_doc = wrap_html(title_full, full_html, pages_fetched, total_scanned)
+    (REPORTS / "report_full.html").write_text(full_doc, encoding="utf-8")
 
     # Useful log line
     print({
         "pages": pages_fetched,
         "rows_scanned": total_scanned,
-        "rows_matched_now": len(filtered),
+        "rows_matched_full": len(filtered),
         "rows_reported_delta": len(delta_rows),
-        "baseline": baseline
+        "baseline": baseline,
+        "empty_pages_tolerated": EMPTY_PAGE_TOLERANCE
     })
 
 if __name__ == "__main__":
