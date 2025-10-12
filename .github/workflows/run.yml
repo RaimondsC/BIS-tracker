@@ -22,20 +22,16 @@ jobs:
 
       - name: Scrape (robust, time-boxed)
         env:
-          # Depth & pacing
           PAGES_TOTAL: "5000"
-          PAGE_ORDER_MODE: "strided"     # "sequential" or "strided"
-          STRIDE: "800"                   # only for "strided"
-          PAGE_DELAY_MS: "100"
-          # Error handling
+          PAGE_ORDER_MODE: "sequential"   # <<< change here
+          # STRIDE is ignored in sequential mode
+          PAGE_DELAY_MS: "120"            # be a bit gentler; reduce if you want faster
           MAX_RETRIES_PER_PAGE: "2"
           RETRY_BASE_MS: "1200"
           EMPTY_PAGE_TOLERANCE: "2"
           ERROR_BAIL_WINDOW: "80"
           ERROR_BAIL_THRESHOLD: "0.75"
-          # Time budget (minutes)
           GLOBAL_MINUTES_BUDGET: "75"
-          # Context rotation
           CONTEXT_ROTATE_EVERY: "350"
         run: |
           python scraper.py
