@@ -1,8 +1,8 @@
-name: BIS Tracker (robust pager: delta + full HTML)
+name: "BIS Tracker (robust pager: delta + full HTML)"
 
-on:
+'on':
   schedule:
-    - cron: "0 3 * * 1"   # Mondays ~06:00 Riga summer / ~05:00 winter
+    - cron: '0 3 * * 1'   # Mondays ~06:00 Riga time (03:00 UTC)
   workflow_dispatch: {}
 
 jobs:
