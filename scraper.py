@@ -7,32 +7,19 @@ import pandas as pd
 # ===================== CONFIG =====================
 BASE = "https://bis.gov.lv"
 # Match UI sort (Lietas numurs dilstoši)
-BASE_LIST = "/bisp/lv/planned_constructions/list?order=case_number&direction=desc&page={page}"
-LIST_URL = BASE + BASE_LIST
+LIST_URL = BASE + "/bisp/lv/planned_constructions/list?order=case_number&direction=desc&page={page}"
 
-# How many list pages to *attempt* per run (upper bound)
-PAGES_TOTAL = int(os.getenv("PAGES_TOTAL", "5000"))
+# How many list pages to attempt this run (upper bound while building baseline)
+PAGES_PER_RUN = int(os.getenv("PAGES_PER_RUN", "3000"))
+# How many pages to scan once baseline is complete (delta sweeps)
+DELTA_SCAN_PAGES = int(os.getenv("DELTA_SCAN_PAGES", "3000"))
 
-# Page visiting order
-PAGE_ORDER_MODE = os.getenv("PAGE_ORDER_MODE", "sequential")  # "sequential" or "strided"
-STRIDE = int(os.getenv("STRIDE", "800"))  # used only in "strided" mode
-
-# Politeness
-PAGE_DELAY_MS = int(os.getenv("PAGE_DELAY_MS", "100"))  # 0 for max speed
-
-# Backend hiccups handling
-MAX_RETRIES_PER_PAGE = int(os.getenv("MAX_RETRIES_PER_PAGE", "2"))  # keep small to avoid long hangs
-RETRY_BASE_MS = int(os.getenv("RETRY_BASE_MS", "1200"))             # base backoff per retry
-EMPTY_PAGE_TOLERANCE = int(os.getenv("EMPTY_PAGE_TOLERANCE", "2"))  # consecutive true empties before stopping
-
-# Bail out early if mostly errors in a sliding window
-ERROR_BAIL_WINDOW = int(os.getenv("ERROR_BAIL_WINDOW", "80"))       # how many recent pages to consider
-ERROR_BAIL_THRESHOLD = float(os.getenv("ERROR_BAIL_THRESHOLD", "0.75"))  # bail if >= 75% of last N pages errored
-
-# Hard time limit (minutes) to end gracefully with reports
+# Politeness / robustness
+PAGE_DELAY_MS = int(os.getenv("PAGE_DELAY_MS", "200"))
+MAX_RETRIES_PER_PAGE = int(os.getenv("MAX_RETRIES_PER_PAGE", "2"))
+RETRY_BASE_MS = int(os.getenv("RETRY_BASE_MS", "3000"))
+EMPTY_PAGE_TOLERANCE = int(os.getenv("EMPTY_PAGE_TOLERANCE", "2"))
 GLOBAL_MINUTES_BUDGET = int(os.getenv("GLOBAL_MINUTES_BUDGET", "75"))
-
-# Rotate Playwright context (new UA/cookies) every N pages
 CONTEXT_ROTATE_EVERY = int(os.getenv("CONTEXT_ROTATE_EVERY", "350"))
 
 # Folders/files
@@ -40,11 +27,14 @@ ROOT = pathlib.Path(".")
 DEBUG_DIR = ROOT / "debug"; DEBUG_DIR.mkdir(parents=True, exist_ok=True)
 REPORTS = ROOT / "reports"; REPORTS.mkdir(parents=True, exist_ok=True)
 STATE_DIR = ROOT / "state"; STATE_DIR.mkdir(parents=True, exist_ok=True)
-STATE_FILE = STATE_DIR / "state.json"
+STATE_FILE = STATE_DIR / "state.json"              # rows you've seen (for delta)
+CURSOR_FILE = STATE_DIR / "cursor.json"            # where to continue (for baseline building)
+RUN_STATUS = REPORTS / "run_status.json"           # machine-readable status for workflow
+BASELINE_FLAG = REPORTS / "baseline_complete.flag" # "yes" or "no" for workflow
 
-# Your filters (we normalize values before comparing)
+# === Your business filters ===
 AUTHORITIES_WHITELIST = {
-    "RĪGAS VALSTSPILSĪTAS PAŠVALDĪBAS PILSĒTAS ATTĪSTĪBAS DEPARTAMENTS",
+    "RĪGAS VALSTSPILSĒTAS PAŠVALDĪBAS PILSĒTAS ATTĪSTĪBAS DEPARTAMENTS",
     "Ādažu novada būvvalde",
     "Saulkrastu novada būvvalde",
     "Ropažu novada pašvaldības būvvalde",
@@ -56,14 +46,12 @@ AUTHORITIES_WHITELIST = {
     "Mārupes novada Būvvalde",
     "Jūrmalas Būvvalde",
 }
-
 PHASE_KEEP = {
     "Iecere",
     "Būvniecības ieceres publiskā apspriešana",
     "Projektēšanas nosacījumu izpilde",
     "Būvdarbu uzsākšanas nosacījumu izpilde",
 }
-
 TYPE_KEEP = {
     "Atjaunošana",
     "Vienkāršota atjaunošana",
@@ -72,7 +60,6 @@ TYPE_KEEP = {
     "Vienkāršota pārbūve",
 }
 
-# Column labels seen on /list?page=N
 HEADER_MAP = {
     "Būvniecības kontroles institūcija": "authority",
     "Lietas numurs": "bis_number",
@@ -81,8 +68,6 @@ HEADER_MAP = {
     "Būvniecības veids": "construction_type",
     "Būvniecības lietas stadija": "phase",
 }
-# ===================================================
-
 
 # ===================== NORMALIZATION =====================
 NBSP = "\u00A0"
@@ -95,41 +80,24 @@ def norm(s: str) -> str:
 AUTHORITIES_NORM = {norm(a): a for a in AUTHORITIES_WHITELIST}
 PHASE_KEEP_NORM   = {norm(x) for x in PHASE_KEEP}
 TYPE_KEEP_NORM    = {norm(x) for x in TYPE_KEEP}
-# ========================================================
-
 
 # ===================== UTIL =====================
 USER_AGENTS = [
-    # a few mainstream desktop UAs
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15",
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36",
 ]
 
-def make_page_sequence(total: int, mode: str, stride: int):
-    if total <= 0:
-        return []
-    if mode == "strided" and stride > 0:
-        # 1, 1+S, 1+2S, ... then 2, 2+S, ...
-        seq = []
-        bucket = min(stride, total)
-        for i in range(1, bucket + 1):
-            k = i
-            while k <= total:
-                seq.append(k)
-                k += stride
-        return seq
-    # default: 1..total
-    return list(range(1, total + 1))
-
-def now_ms():
-    return int(time.time() * 1000)
-# ========================================================
-
+def looks_like_backend_error(html: str) -> bool:
+    t = (html or "").lower()
+    if "503 service temporarily unavailable" in t:
+        return True
+    if "sistēmas kļūda" in t or "sistemas kluda" in t or "sistemu kluda" in t:
+        return True
+    return False
 
 # ===================== PARSING =====================
 def extract_value(cell, header_text: str) -> str:
-    """Values include screen-reader prefix 'Label: Value'. Strip 'Label:'."""
     val_el = cell.select_one(".flextable__value")
     t = norm(val_el.get_text(" ", strip=True) if val_el else "")
     prefix = header_text + ":"
@@ -138,15 +106,10 @@ def extract_value(cell, header_text: str) -> str:
     return t
 
 def parse_page(html: str):
-    """
-    Return (total_rows_on_page, parsed_rows).
-    'parsed_rows' are NOT filtered yet.
-    """
     soup = BeautifulSoup(html, "lxml")
     row_nodes = soup.select(".flextable__row")
     total_rows = len(row_nodes)
     out = []
-
     for row in row_nodes:
         rec = {"details_url": None}
         for cell in row.select(".flextable__cell"):
@@ -154,7 +117,6 @@ def parse_page(html: str):
             key = HEADER_MAP.get(header)
             if not key:
                 continue
-
             text = extract_value(cell, header)
             a = cell.select_one("a.public_list__link[href]")
             if key == "bis_number" and a:
@@ -164,17 +126,11 @@ def parse_page(html: str):
                 rec["details_url"] = href
                 text = norm(a.get_text(" ", strip=True))
             rec[key] = text
-
-        # Stable key; prefer BIS number
         rec["_key"] = rec.get("bis_number") or hashlib.sha256(
             "|".join([rec.get("authority",""), rec.get("address",""), rec.get("object","")]).encode("utf-8")
         ).hexdigest()[:24]
-
         out.append(rec)
-
     return total_rows, out
-# ===================================================
-
 
 # ===================== FILTER + DIFF =====================
 def filter_row(rec: dict) -> bool:
@@ -197,24 +153,24 @@ def load_state() -> dict:
 def save_state(state: dict):
     STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
+def load_cursor():
+    if CURSOR_FILE.exists():
+        return json.loads(CURSOR_FILE.read_text(encoding="utf-8"))
+    return {"next_page": 1, "baseline_complete": False}
+
+def save_cursor(cursor):
+    CURSOR_FILE.write_text(json.dumps(cursor, ensure_ascii=False, indent=2), encoding="utf-8")
+
 def compute_delta(prev_state: dict, filtered_rows: list[dict]):
-    """
-    Returns (delta_rows, updated_state, baseline_flag)
-    - delta_rows: only NEW or CHANGED (phase) rows to report
-    - updated_state: merged state after this run
-    - baseline_flag: True if this is the very first run (no previous state)
-    """
     baseline = (len(prev_state) == 0)
     today = datetime.now().strftime("%Y-%m-%d")
     updated = dict(prev_state)
     delta = []
-
     for r in filtered_rows:
         key = r["_key"]
         auth_n = norm(r.get("authority"))
         phase_n = norm(r.get("phase"))
         type_n  = norm(r.get("construction_type"))
-
         canon_authority = AUTHORITIES_NORM.get(auth_n, r.get("authority"))
         current = {
             "bis_number": r.get("bis_number",""),
@@ -226,7 +182,6 @@ def compute_delta(prev_state: dict, filtered_rows: list[dict]):
             "details_url": r.get("details_url",""),
             "last_seen": today,
         }
-
         old = updated.get(key)
         if old is None:
             if not baseline:
@@ -236,26 +191,8 @@ def compute_delta(prev_state: dict, filtered_rows: list[dict]):
             if old.get("phase") != phase_n:
                 tag = f"Stadija: {old.get('phase','?')} → {phase_n or '?'}"
                 delta.append({**current, "_key": key, "_change": tag})
-            updated[key] = {
-                **old,
-                **current,
-                "first_seen": old.get("first_seen", today)
-            }
-
+            updated[key] = {**old, **current, "first_seen": old.get("first_seen", today)}
     return delta, updated, baseline
-# =========================================================
-
-
-# ===================== ERROR DETECTION =====================
-def looks_like_backend_error(html: str) -> bool:
-    t = (html or "").lower()
-    if "503 service temporarily unavailable" in t:
-        return True
-    if "sistēmas kļūda" in t or "sistemas kluda" in t or "sistemu kluda" in t:
-        return True
-    return False
-# ==========================================================
-
 
 # ===================== REPORTS (HTML) =====================
 def html_table_from_rows(rows: list[dict], include_change_col: bool) -> str:
@@ -265,14 +202,11 @@ def html_table_from_rows(rows: list[dict], include_change_col: bool) -> str:
     if include_change_col:
         cols = ["_change"] + cols
     df = pd.DataFrame(rows)[cols].copy()
-
     def linkify(r):
         if r.get("details_url") and r.get("bis_number"):
             return f'<a href="{r["details_url"]}" target="_blank" rel="noopener">{r["bis_number"]}</a>'
         return r.get("bis_number","")
-
     df["BIS lieta"] = df.apply(linkify, axis=1)
-
     rename = {
         "authority": "Būvniecības kontroles institūcija",
         "address": "Adrese",
@@ -281,14 +215,12 @@ def html_table_from_rows(rows: list[dict], include_change_col: bool) -> str:
         "construction_type": "Būvniecības veids",
         "_change": "Izmaiņas",
     }
-
     if include_change_col:
         df = df[["Izmaiņas","BIS lieta","Būvniecības kontroles institūcija","Adrese","Būves nosaukums",
-                 "Būvniecības lietas stadija","Būvniecības veids"]].rename(columns={}, inplace=False)
+                 "Būvniecības lietas stadija","Būvniecības veids"]]
     else:
         df = df[["BIS lieta","Būvniecības kontroles institūcija","Adrese","Būves nosaukums",
-                 "Būvniecības lietas stadija","Būvniecības veids"]].rename(columns={}, inplace=False)
-
+                 "Būvniecības lietas stadija","Būvniecības veids"]]
     df.rename(columns=rename, inplace=True, errors="ignore")
     return df.to_html(index=False, escape=False)
 
@@ -308,9 +240,7 @@ def wrap_html(title: str, body_html: str, pages_seen: int, scanned: int, notes: 
     <p class="muted"><strong>Pārlapotas lapas:</strong> {pages_seen} &nbsp;|&nbsp;
        <strong>Rindas skenētas kopā:</strong> {scanned}</p>
     """
-    notes_html = ""
-    if notes:
-        notes_html = "".join(f'<div class="note">{n}</div>' for n in notes)
+    notes_html = "".join(f'<div class="note">{n}</div>' for n in (notes or []))
     return f"""<!doctype html><meta charset="utf-8"><title>{title}</title>{css}
     <h1>{title}</h1>
     <p><small>{datetime.now().strftime('%Y-%m-%d %H:%M')}</small></p>
@@ -318,8 +248,6 @@ def wrap_html(title: str, body_html: str, pages_seen: int, scanned: int, notes: 
     {notes_html}
     {body_html}
     """
-# ============================================================
-
 
 # ===================== MAIN =====================
 async def main():
@@ -329,11 +257,8 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch()
 
-        def new_context():
+        async def new_context():
             ua = random.choice(USER_AGENTS)
-            return await_new_context(browser, ua)
-
-        async def await_new_context(browser, ua):
             ctx = await browser.new_context(
                 user_agent=ua,
                 locale="lv-LV",
@@ -348,42 +273,39 @@ async def main():
 
         ctx, page = await new_context()
 
-        # Visiting order
-        sequence = make_page_sequence(PAGES_TOTAL, PAGE_ORDER_MODE, STRIDE)
+        cursor = load_cursor()
+        baseline_complete = bool(cursor.get("baseline_complete", False))
+
+        # Determine the page window for this run
+        if baseline_complete:
+            start_page = 1
+            pages_to_scan = DELTA_SCAN_PAGES
+        else:
+            start_page = int(cursor.get("next_page", 1))
+            pages_to_scan = PAGES_PER_RUN
+
+        end_page_goal = start_page + pages_to_scan - 1
 
         all_parsed = []
         total_scanned = 0
         pages_fetched = 0
         consec_empty = 0
-
-        # rolling error window
-        from collections import deque
-        recent = deque(maxlen=ERROR_BAIL_WINDOW)
         error_pages = []
         empty_pages = []
 
         async def rotate_context():
             nonlocal ctx, page
             try:
-                await page.close()
-                await ctx.close()
+                await page.close(); await ctx.close()
             except:
                 pass
             ctx, page = await new_context()
 
-        for index, n in enumerate(sequence, start=1):
-            if datetime.utcnow() >= deadline:
-                break
-
-            # periodic context rotate
-            if index % CONTEXT_ROTATE_EVERY == 0:
-                await rotate_context()
-
-            # add little random jitter param to avoid intermediate caches
-            url = LIST_URL.format(page=n) + f"&_={random.randint(100000,999999)}"
+        n = start_page
+        while n <= end_page_goal and datetime.utcnow() < deadline:
+            url = LIST_URL.format(page=n)
             retries = 0
             page_ok = False
-            html = ""
 
             while retries <= MAX_RETRIES_PER_PAGE and datetime.utcnow() < deadline:
                 try:
@@ -411,12 +333,9 @@ async def main():
                         retries += 1
                         if retries > MAX_RETRIES_PER_PAGE:
                             error_pages.append(n)
-                            recent.append(1)  # mark as error
                             break
-                        # backoff + jitter
                         backoff = RETRY_BASE_MS * (2 ** (retries - 1)) + random.randint(0, 400)
                         await page.wait_for_timeout(backoff)
-                        # on second failure, rotate context once
                         if retries == 2:
                             await rotate_context()
                         continue
@@ -429,43 +348,43 @@ async def main():
                         empty_pages.append(n)
                         consec_empty += 1
                         (DEBUG_DIR / f"page-{n}-EMPTY.html").write_text(html, encoding="utf-8")
-                        recent.append(0)  # empty but not error
                         if consec_empty >= EMPTY_PAGE_TOLERANCE:
                             page_ok = True
+                            # If we were building baseline and hit true end-of-list, mark complete.
+                            if not baseline_complete:
+                                baseline_complete = True
                             break
                     else:
                         consec_empty = 0
                         all_parsed.extend(parsed_rows)
                         page_ok = True
-                        recent.append(0)  # success
-
-                    break  # done with this page
+                    break
 
                 except TimeoutError:
                     retries += 1
                     if retries > MAX_RETRIES_PER_PAGE:
                         error_pages.append(n)
-                        recent.append(1)
                         break
                     backoff = RETRY_BASE_MS * (2 ** (retries - 1)) + random.randint(0, 400)
                     await page.wait_for_timeout(backoff)
                     if retries == 2:
                         await rotate_context()
 
-            # error-storm bailout: too many errors in last window?
-            if len(recent) == ERROR_BAIL_WINDOW:
-                if (sum(recent) / len(recent)) >= ERROR_BAIL_THRESHOLD:
-                    # save a marker and bail
-                    (DEBUG_DIR / "ERROR_STORM.txt").write_text(
-                        f"High error rate in last {len(recent)} pages. Bailing early.\n", encoding="utf-8"
-                    )
-                    break
-
             if PAGE_DELAY_MS > 0:
                 await page.wait_for_timeout(PAGE_DELAY_MS)
 
+            if not page_ok and not baseline_complete:
+                # couldn't load this page; still move forward so we eventually cover everything
+                pass
+
             if consec_empty >= EMPTY_PAGE_TOLERANCE:
                 break
+
+            n += 1
+
+        # Update cursor
+        next_page = n if consec_empty < EMPTY_PAGE_TOLERANCE else 1
+        save_cursor({"next_page": next_page, "baseline_complete": baseline_complete})
 
         try:
             await page.close(); await ctx.close()
@@ -481,7 +400,7 @@ async def main():
             r["authority"] = AUTHORITIES_NORM.get(auth_n, r.get("authority"))
             r["phase"] = norm(r.get("phase"))
             r["construction_type"] = norm(r.get("construction_type"))
-            filtered_map[r["_key"]] = r  # de-dup by key
+            filtered_map[r["_key"]] = r
     filtered = list(filtered_map.values())
 
     # Delta vs previous state
@@ -489,20 +408,19 @@ async def main():
     delta_rows, updated_state, baseline = compute_delta(prev_state, filtered)
     save_state(updated_state)
 
-    # Notes for the report
+    # Notes
     notes = []
-    if baseline:
-        notes.append("Šis ir bāzes skrējiens. Izmaiņu saraksts tiks sūtīts no nākamā skrējiena.")
+    if baseline or not baseline_complete:
+        notes.append("Bāzes momentuzņēmums tiek veidots vairākos skrējienos (kursors turpinās nākamajā reizē).")
+    if baseline_complete and not baseline:
+        notes.append(f"Baseline pabeigts iepriekš. Šajā skrējienā skenētas pirmās {DELTA_SCAN_PAGES} lapas (delta).")
     if error_pages:
-        notes.append(f"Iespējami servera ierobežojumi (503). Lapas ar kļūdām (piemēri): {', '.join(map(str, error_pages[:20]))}"
+        notes.append(f"Servera kļūdas lapās: {', '.join(map(str, error_pages[:20]))}"
                      + (" ..." if len(error_pages) > 20 else ""))
     if empty_pages:
-        notes.append(f"Tika konstatētas {len(empty_pages)} tukšas lapas (bez rindām). Pēc {EMPTY_PAGE_TOLERANCE} pēc kārtas meklēšana tiek pārtraukta.")
-    elapsed = int((datetime.utcnow() - start).total_seconds() // 60)
-    notes.append(f"Skrējiena laiks: ~{elapsed} min; apmeklēšanas kārta: {PAGE_ORDER_MODE}"
-                 + (f" (solis {STRIDE})" if PAGE_ORDER_MODE=='strided' else ""))
+        notes.append(f"Tika konstatētas {len(empty_pages)} tukšas lapas. Pēc {EMPTY_PAGE_TOLERANCE} pēc kārtas meklēšana tiek pārtraukta.")
 
-    # Build BOTH reports (delta + full)
+    # Build BOTH reports (we’ll choose what to attach in the workflow)
     delta_html = html_table_from_rows(delta_rows, include_change_col=True)
     full_html  = html_table_from_rows(filtered,   include_change_col=False)
 
@@ -510,23 +428,30 @@ async def main():
     delta_doc = wrap_html(title_delta, delta_html, pages_fetched, total_scanned, notes=notes if (delta_rows or baseline or error_pages) else None)
     (REPORTS / "report_delta.html").write_text(delta_doc, encoding="utf-8")
 
-    title_full = "BIS – pilns momentuzņēmums (atlasītie ieraksti)"
-    full_doc = wrap_html(title_full, full_html, pages_fetched, total_scanned, notes=notes if not (delta_rows or baseline) else None)
+    title_full = "BIS – pilns momentuzņēmums (atlasītie ieraksti no šī skrējiena)"
+    full_doc = wrap_html(title_full, full_html, pages_fetched, total_scanned, notes=notes if baseline or not baseline_complete else None)
     (REPORTS / "report_full.html").write_text(full_doc, encoding="utf-8")
 
-    # Log
+    # Expose simple status for the workflow step
+    status = {
+        "baseline_run": baseline,
+        "baseline_complete": baseline_complete,
+        "pages_scanned_this_run": pages_fetched,
+        "start_page": start_page,
+        "end_page_goal": end_page_goal,
+        "next_page": next_page
+    }
+    RUN_STATUS.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding="utf-8")
+    BASELINE_FLAG.write_text("yes" if baseline_complete else "no", encoding="utf-8")
+
     print({
-        "pages_attempted": PAGES_TOTAL,
-        "pages_success": pages_fetched,
+        "baseline_run": baseline,
+        "baseline_complete": baseline_complete,
+        "pages_scanned": pages_fetched,
         "rows_scanned": total_scanned,
         "rows_matched_full": len(filtered),
         "rows_reported_delta": len(delta_rows),
-        "baseline": baseline,
-        "errors_count": len(error_pages),
-        "empties_count": len(empty_pages),
-        "order": PAGE_ORDER_MODE,
-        "stride": STRIDE,
-        "minutes": elapsed
+        "next_page": next_page
     })
 
 if __name__ == "__main__":
