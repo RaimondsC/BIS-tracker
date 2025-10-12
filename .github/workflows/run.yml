@@ -1,4 +1,4 @@
-name: "BIS Tracker (robust pager: delta + full HTML)"
+name: "BIS Tracker (robust + budgeted: delta + full HTML)"
 
 'on':
   schedule:
@@ -20,17 +20,27 @@ jobs:
           python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      - name: Scrape (direct URL pagination with retries/backoff)
+      - name: Scrape (robust, time-boxed)
         env:
-          PAGES_TOTAL: "5000"            # raise/lower freely
-          PAGE_DELAY_MS: "50"            # 0 for max speed; raise if the site is touchy
-          MAX_RETRIES_PER_PAGE: "4"      # retries when page errors (503 etc.)
-          RETRY_BASE_MS: "1200"          # base backoff; grows exponentially per retry
-          EMPTY_PAGE_TOLERANCE: "2"      # consecutive true empty pages before stopping
+          # Depth & pacing
+          PAGES_TOTAL: "5000"
+          PAGE_ORDER_MODE: "strided"     # "sequential" or "strided"
+          STRIDE: "800"                   # only for "strided"
+          PAGE_DELAY_MS: "100"
+          # Error handling
+          MAX_RETRIES_PER_PAGE: "2"
+          RETRY_BASE_MS: "1200"
+          EMPTY_PAGE_TOLERANCE: "2"
+          ERROR_BAIL_WINDOW: "80"
+          ERROR_BAIL_THRESHOLD: "0.75"
+          # Time budget (minutes)
+          GLOBAL_MINUTES_BUDGET: "75"
+          # Context rotation
+          CONTEXT_ROTATE_EVERY: "350"
         run: |
           python scraper.py
 
-      - name: Upload debug HTML (first pages + error/empty pages)
+      - name: Upload debug (first pages + error/empty markers)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -49,7 +59,7 @@ jobs:
       - name: Email reports (HTML only)
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: ${{ secrets.SMTP_SERVER }}   # smtp.gmail.com
+          server_address: ${{ secrets.SMTP_SERVER }}   # e.g., smtp.gmail.com
           server_port: ${{ secrets.SMTP_PORT }}        # 587
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
@@ -61,8 +71,9 @@ jobs:
             <p>Sveiki! Pievienotas atskaites:</p>
             <ul>
               <li><code>report_delta.html</code> – tikai jauni ieraksti un stadiju izmaiņas</li>
-              <li><code>report_full.html</code> – pilns momentuzņēmums (visi atlasītie ieraksti)</li>
+              <li><code>report_full.html</code> – pilns momentuzņēmums (visi atlasītie ieraksti no šī skrējiena)</li>
             </ul>
+            <p><small>Ja serveris bieži atgriež 503, skrējiens tiek laipni pārtraukts pirms 6h limīta un saglabā daļējus rezultātus.</small></p>
           attachments: |
             reports/report_delta.html
             reports/report_full.html
