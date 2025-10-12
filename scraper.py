@@ -17,7 +17,7 @@ DELTA_SCAN_PAGES = int(os.getenv("DELTA_SCAN_PAGES", "3000"))
 # Politeness / robustness
 PAGE_DELAY_MS = int(os.getenv("PAGE_DELAY_MS", "200"))
 MAX_RETRIES_PER_PAGE = int(os.getenv("MAX_RETRIES_PER_PAGE", "2"))
-RETRY_BASE_MS = int(os.getenv("RETRY_BASE_MS", "3000"))
+RETRY_BASE_MS = int(os.getenv("RETRY_BASE_MS", "2000"))
 EMPTY_PAGE_TOLERANCE = int(os.getenv("EMPTY_PAGE_TOLERANCE", "2"))
 GLOBAL_MINUTES_BUDGET = int(os.getenv("GLOBAL_MINUTES_BUDGET", "75"))
 CONTEXT_ROTATE_EVERY = int(os.getenv("CONTEXT_ROTATE_EVERY", "350"))
