@@ -1,8 +1,8 @@
-name: "BIS Tracker (cursor resume → delta only)"
+name: "BIS Tracker (cursor + failed-pages-first)"
 
 'on':
   schedule:
-    - cron: '0 3 * * 1'   # Mondays ~06:00 Riga time (03:00 UTC)
+    - cron: '0 3 * * 1-5'   # Weekdays 03:00 UTC ≈ 06:00 Riga in summer
   workflow_dispatch: {}
 
 jobs:
@@ -20,16 +20,25 @@ jobs:
           python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      - name: Scrape (sequential, time-boxed, with cursor)
+      - name: Scrape (sequential cursor, failed-pages-first)
         env:
-          PAGES_PER_RUN: "3000"           # how many pages to add to baseline per run
-          DELTA_SCAN_PAGES: "3000"          # after baseline: how many pages for delta sweep
-          PAGE_DELAY_MS: "200"
-          MAX_RETRIES_PER_PAGE: "2"
-          RETRY_BASE_MS: "2000"
+          # Baseline builder (per run)
+          PAGES_PER_RUN: "3000"
+          # Delta sweeps (after baseline_complete = yes)
+          DELTA_SCAN_PAGES: "3000"
+          # Pacing
+          PAGE_DELAY_MS: "250"
+          # Error handling
+          MAX_RETRIES_PER_PAGE: "1"
+          RETRY_BASE_MS: "2500"
           EMPTY_PAGE_TOLERANCE: "2"
+          ERROR_BAIL_WINDOW: "60"
+          ERROR_BAIL_THRESHOLD: "0.8"
           GLOBAL_MINUTES_BUDGET: "75"
           CONTEXT_ROTATE_EVERY: "350"
+          # Failed pages queue
+          FAILED_PAGE_RETRY_LIMIT: "200"
+          FAILED_PAGE_MAX_ATTEMPTS: "8"
         run: |
           python scraper.py
 
@@ -60,7 +69,7 @@ jobs:
           echo "complete=$VAL" >> "$GITHUB_OUTPUT"
 
       # Email while baseline is NOT complete: send FULL + DELTA
-      - name: Email (baseline building — send full + delta)
+      - name: Email (baseline building — full + delta)
         if: steps.baseline.outputs.complete == 'no'
         uses: dawidd6/action-send-mail@v3
         with:
@@ -75,15 +84,15 @@ jobs:
           html_body: |
             <p>Sveiki! Turpinās bāzes momentuzņēmuma veidošana. Pielikumā:</p>
             <ul>
-              <li><code>report_full.html</code> – šī skrējiena pilnais atlasīto ierakstu saraksts</li>
-              <li><code>report_delta.html</code> – tikai jauni ieraksti un stadiju izmaiņas (pret redzēto)</li>
+              <li><code>report_full.html</code> – šī skrējiena pilns atlasīto ierakstu saraksts</li>
+              <li><code>report_delta.html</code> – tikai jauni ieraksti un stadiju izmaiņas</li>
             </ul>
           attachments: |
             reports/report_full.html
             reports/report_delta.html
 
       # Email after baseline complete: send DELTA only
-      - name: Email (baseline complete — send delta only)
+      - name: Email (baseline complete — delta only)
         if: steps.baseline.outputs.complete == 'yes'
         uses: dawidd6/action-send-mail@v3
         with:
@@ -96,6 +105,6 @@ jobs:
           from: ${{ secrets.MAIL_FROM }}
           secure: false
           html_body: |
-            <p>Sveiki! Pielikumā jaunumi un stadiju izmaiņas (delta).</p>
+            <p>Sveiki! Pielikumā jaunumi un stadiju izmaiņas (delta) no šī skrējiena.</p>
           attachments: |
             reports/report_delta.html
