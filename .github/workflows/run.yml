@@ -26,7 +26,7 @@ jobs:
           DELTA_SCAN_PAGES: "3000"          # after baseline: how many pages for delta sweep
           PAGE_DELAY_MS: "200"
           MAX_RETRIES_PER_PAGE: "2"
-          RETRY_BASE_MS: "1200"
+          RETRY_BASE_MS: "2000"
           EMPTY_PAGE_TOLERANCE: "2"
           GLOBAL_MINUTES_BUDGET: "75"
           CONTEXT_ROTATE_EVERY: "350"
