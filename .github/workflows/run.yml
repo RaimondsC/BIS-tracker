@@ -1,4 +1,4 @@
-name: BIS Tracker (delta + full HTML)
+name: BIS Tracker (robust pager: delta + full HTML)
 
 on:
   schedule:
@@ -20,15 +20,17 @@ jobs:
           python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      - name: Scrape (direct URL pagination)
+      - name: Scrape (direct URL pagination with retries/backoff)
         env:
-          PAGES_TOTAL: "5000"          # raise/lower freely
-          PAGE_DELAY_MS: "25"          # set "0" for max speed
-          EMPTY_PAGE_TOLERANCE: "10"    # consecutive empty pages before stopping
+          PAGES_TOTAL: "5000"            # raise/lower freely
+          PAGE_DELAY_MS: "50"            # 0 for max speed; raise if the site is touchy
+          MAX_RETRIES_PER_PAGE: "4"      # retries when page errors (503 etc.)
+          RETRY_BASE_MS: "1200"          # base backoff; grows exponentially per retry
+          EMPTY_PAGE_TOLERANCE: "2"      # consecutive true empty pages before stopping
         run: |
           python scraper.py
 
-      - name: Upload debug HTML (first pages + empties)
+      - name: Upload debug HTML (first pages + error/empty pages)
         if: always()
         uses: actions/upload-artifact@v4
         with:
