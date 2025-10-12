@@ -1,4 +1,4 @@
-name: "BIS Tracker (robust + budgeted: delta + full HTML)"
+name: "BIS Tracker (cursor resume → delta only)"
 
 'on':
   schedule:
@@ -20,17 +20,14 @@ jobs:
           python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      - name: Scrape (robust, time-boxed)
+      - name: Scrape (sequential, time-boxed, with cursor)
         env:
-          PAGES_TOTAL: "5000"
-          PAGE_ORDER_MODE: "sequential"   # <<< change here
-          # STRIDE is ignored in sequential mode
-          PAGE_DELAY_MS: "120"            # be a bit gentler; reduce if you want faster
+          PAGES_PER_RUN: "3000"           # how many pages to add to baseline per run
+          DELTA_SCAN_PAGES: "3000"          # after baseline: how many pages for delta sweep
+          PAGE_DELAY_MS: "200"
           MAX_RETRIES_PER_PAGE: "2"
           RETRY_BASE_MS: "1200"
           EMPTY_PAGE_TOLERANCE: "2"
-          ERROR_BAIL_WINDOW: "80"
-          ERROR_BAIL_THRESHOLD: "0.75"
           GLOBAL_MINUTES_BUDGET: "75"
           CONTEXT_ROTATE_EVERY: "350"
         run: |
@@ -44,32 +41,61 @@ jobs:
           path: debug
           if-no-files-found: ignore
 
-      - name: Commit state + reports
+      - name: Commit state + reports + cursor
         run: |
           git config user.name "bis-bot"
           git config user.email "bis-bot@users.noreply.github.com"
-          git add state/state.json reports/report_*.html || true
+          git add state/*.json reports/report_*.html reports/run_status.json reports/baseline_complete.flag || true
           git commit -m "Snapshot & reports: $(date -u +'%Y-%m-%d %H:%M')" || echo "Nothing to commit"
           git push
 
-      - name: Email reports (HTML only)
+      - name: Read baseline flag
+        id: baseline
+        run: |
+          if [ -f reports/baseline_complete.flag ]; then
+            VAL=$(cat reports/baseline_complete.flag)
+          else
+            VAL="no"
+          fi
+          echo "complete=$VAL" >> "$GITHUB_OUTPUT"
+
+      # Email while baseline is NOT complete: send FULL + DELTA
+      - name: Email (baseline building — send full + delta)
+        if: steps.baseline.outputs.complete == 'no'
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: ${{ secrets.SMTP_SERVER }}   # e.g., smtp.gmail.com
-          server_port: ${{ secrets.SMTP_PORT }}        # 587
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: BIS tracker — atskaite ${{ github.run_id }}
+          subject: BIS tracker — bāzes skrējiens ${{ github.run_id }}
           to: ${{ secrets.MAIL_TO }}
           from: ${{ secrets.MAIL_FROM }}
-          secure: false            # 587 with STARTTLS (no 'starttls' key)
+          secure: false
           html_body: |
-            <p>Sveiki! Pievienotas atskaites:</p>
+            <p>Sveiki! Turpinās bāzes momentuzņēmuma veidošana. Pielikumā:</p>
             <ul>
-              <li><code>report_delta.html</code> – tikai jauni ieraksti un stadiju izmaiņas</li>
-              <li><code>report_full.html</code> – pilns momentuzņēmums (visi atlasītie ieraksti no šī skrējiena)</li>
+              <li><code>report_full.html</code> – šī skrējiena pilnais atlasīto ierakstu saraksts</li>
+              <li><code>report_delta.html</code> – tikai jauni ieraksti un stadiju izmaiņas (pret redzēto)</li>
             </ul>
-            <p><small>Ja serveris bieži atgriež 503, skrējiens tiek laipni pārtraukts pirms 6h limīta un saglabā daļējus rezultātus.</small></p>
+          attachments: |
+            reports/report_full.html
+            reports/report_delta.html
+
+      # Email after baseline complete: send DELTA only
+      - name: Email (baseline complete — send delta only)
+        if: steps.baseline.outputs.complete == 'yes'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: BIS tracker — izmaiņas ${{ github.run_id }}
+          to: ${{ secrets.MAIL_TO }}
+          from: ${{ secrets.MAIL_FROM }}
+          secure: false
+          html_body: |
+            <p>Sveiki! Pielikumā jaunumi un stadiju izmaiņas (delta).</p>
           attachments: |
             reports/report_delta.html
-            reports/report_full.html
