@@ -1,5 +1,5 @@
-import os, pathlib, hashlib, re, json, collections, random
-from datetime import datetime
+import os, pathlib, hashlib, re, json, collections, random, time
+from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright, TimeoutError
 import pandas as pd
@@ -7,20 +7,33 @@ import pandas as pd
 # ===================== CONFIG =====================
 BASE = "https://bis.gov.lv"
 # Match UI sort (Lietas numurs dilstoši)
-LIST_URL = BASE + "/bisp/lv/planned_constructions/list?order=case_number&direction=desc&page={page}"
+BASE_LIST = "/bisp/lv/planned_constructions/list?order=case_number&direction=desc&page={page}"
+LIST_URL = BASE + BASE_LIST
 
-# How many list pages to scan this run (override in workflow env)
+# How many list pages to *attempt* per run (upper bound)
 PAGES_TOTAL = int(os.getenv("PAGES_TOTAL", "5000"))
 
-# Politeness delay between successful pages in milliseconds (0 = none)
-PAGE_DELAY_MS = int(os.getenv("PAGE_DELAY_MS", "50"))
+# Page visiting order
+PAGE_ORDER_MODE = os.getenv("PAGE_ORDER_MODE", "sequential")  # "sequential" or "strided"
+STRIDE = int(os.getenv("STRIDE", "800"))  # used only in "strided" mode
 
-# Retry/backoff for backend hiccups (e.g., 503 / sistēmas kļūda)
-MAX_RETRIES_PER_PAGE = int(os.getenv("MAX_RETRIES_PER_PAGE", "4"))
-RETRY_BASE_MS = int(os.getenv("RETRY_BASE_MS", "1200"))  # base backoff per retry
+# Politeness
+PAGE_DELAY_MS = int(os.getenv("PAGE_DELAY_MS", "100"))  # 0 for max speed
 
-# Stop only after this many consecutive TRUE empty pages (not errors)
-EMPTY_PAGE_TOLERANCE = int(os.getenv("EMPTY_PAGE_TOLERANCE", "2"))
+# Backend hiccups handling
+MAX_RETRIES_PER_PAGE = int(os.getenv("MAX_RETRIES_PER_PAGE", "2"))  # keep small to avoid long hangs
+RETRY_BASE_MS = int(os.getenv("RETRY_BASE_MS", "1200"))             # base backoff per retry
+EMPTY_PAGE_TOLERANCE = int(os.getenv("EMPTY_PAGE_TOLERANCE", "2"))  # consecutive true empties before stopping
+
+# Bail out early if mostly errors in a sliding window
+ERROR_BAIL_WINDOW = int(os.getenv("ERROR_BAIL_WINDOW", "80"))       # how many recent pages to consider
+ERROR_BAIL_THRESHOLD = float(os.getenv("ERROR_BAIL_THRESHOLD", "0.75"))  # bail if >= 75% of last N pages errored
+
+# Hard time limit (minutes) to end gracefully with reports
+GLOBAL_MINUTES_BUDGET = int(os.getenv("GLOBAL_MINUTES_BUDGET", "75"))
+
+# Rotate Playwright context (new UA/cookies) every N pages
+CONTEXT_ROTATE_EVERY = int(os.getenv("CONTEXT_ROTATE_EVERY", "350"))
 
 # Folders/files
 ROOT = pathlib.Path(".")
@@ -82,6 +95,35 @@ def norm(s: str) -> str:
 AUTHORITIES_NORM = {norm(a): a for a in AUTHORITIES_WHITELIST}
 PHASE_KEEP_NORM   = {norm(x) for x in PHASE_KEEP}
 TYPE_KEEP_NORM    = {norm(x) for x in TYPE_KEEP}
+# ========================================================
+
+
+# ===================== UTIL =====================
+USER_AGENTS = [
+    # a few mainstream desktop UAs
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36",
+]
+
+def make_page_sequence(total: int, mode: str, stride: int):
+    if total <= 0:
+        return []
+    if mode == "strided" and stride > 0:
+        # 1, 1+S, 1+2S, ... then 2, 2+S, ...
+        seq = []
+        bucket = min(stride, total)
+        for i in range(1, bucket + 1):
+            k = i
+            while k <= total:
+                seq.append(k)
+                k += stride
+        return seq
+    # default: 1..total
+    return list(range(1, total + 1))
+
+def now_ms():
+    return int(time.time() * 1000)
 # ========================================================
 
 
@@ -209,7 +251,6 @@ def looks_like_backend_error(html: str) -> bool:
     t = (html or "").lower()
     if "503 service temporarily unavailable" in t:
         return True
-    # Latvian system error page
     if "sistēmas kļūda" in t or "sistemas kluda" in t or "sistemu kluda" in t:
         return True
     return False
@@ -282,35 +323,77 @@ def wrap_html(title: str, body_html: str, pages_seen: int, scanned: int, notes: 
 
 # ===================== MAIN =====================
 async def main():
+    start = datetime.utcnow()
+    deadline = start + timedelta(minutes=GLOBAL_MINUTES_BUDGET)
+
     async with async_playwright() as p:
         browser = await p.chromium.launch()
-        ctx = await browser.new_context()
-        page = await ctx.new_page()
+
+        def new_context():
+            ua = random.choice(USER_AGENTS)
+            return await_new_context(browser, ua)
+
+        async def await_new_context(browser, ua):
+            ctx = await browser.new_context(
+                user_agent=ua,
+                locale="lv-LV",
+                extra_http_headers={
+                    "Accept-Language": "lv-LV,lv;q=0.9,en;q=0.8",
+                    "Cache-Control": "no-cache",
+                },
+                viewport={"width": 1280, "height": 900}
+            )
+            page = await ctx.new_page()
+            return ctx, page
+
+        ctx, page = await new_context()
+
+        # Visiting order
+        sequence = make_page_sequence(PAGES_TOTAL, PAGE_ORDER_MODE, STRIDE)
 
         all_parsed = []
         total_scanned = 0
         pages_fetched = 0
-        consecutive_empty = 0
+        consec_empty = 0
 
-        # Diagnostics
-        error_pages = []   # pages that ended with backend error after retries
-        empty_pages = []   # true empty pages (no rows, not error)
+        # rolling error window
+        from collections import deque
+        recent = deque(maxlen=ERROR_BAIL_WINDOW)
+        error_pages = []
+        empty_pages = []
 
-        for n in range(1, PAGES_TOTAL + 1):
-            url = LIST_URL.format(page=n)
+        async def rotate_context():
+            nonlocal ctx, page
+            try:
+                await page.close()
+                await ctx.close()
+            except:
+                pass
+            ctx, page = await new_context()
+
+        for index, n in enumerate(sequence, start=1):
+            if datetime.utcnow() >= deadline:
+                break
+
+            # periodic context rotate
+            if index % CONTEXT_ROTATE_EVERY == 0:
+                await rotate_context()
+
+            # add little random jitter param to avoid intermediate caches
+            url = LIST_URL.format(page=n) + f"&_={random.randint(100000,999999)}"
             retries = 0
             page_ok = False
             html = ""
 
-            while retries <= MAX_RETRIES_PER_PAGE:
+            while retries <= MAX_RETRIES_PER_PAGE and datetime.utcnow() < deadline:
                 try:
                     await page.goto(url, wait_until="domcontentloaded", timeout=180000)
-                    # give a moment for rows (and avoid false empties)
                     try:
                         await page.wait_for_selector(".flextable__row", timeout=2500)
                     except TimeoutError:
                         pass
-                    # Accept cookies if shown
+
+                    # accept cookies if shown
                     try:
                         for t in ["Apstiprināt", "Apstiprināt izvēlētās", "Apstiprināt visas", "Piekrītu"]:
                             btn = page.get_by_text(t, exact=False).first
@@ -323,64 +406,77 @@ async def main():
                     await page.wait_for_timeout(200)
                     html = await page.content()
 
-                    # Backend error?
                     if looks_like_backend_error(html):
-                        # save the first few attempts for this page
                         (DEBUG_DIR / f"page-{n}-ERROR-r{retries}.html").write_text(html, encoding="utf-8")
                         retries += 1
                         if retries > MAX_RETRIES_PER_PAGE:
                             error_pages.append(n)
+                            recent.append(1)  # mark as error
                             break
-                        # exponential backoff + small jitter
+                        # backoff + jitter
                         backoff = RETRY_BASE_MS * (2 ** (retries - 1)) + random.randint(0, 400)
                         await page.wait_for_timeout(backoff)
+                        # on second failure, rotate context once
+                        if retries == 2:
+                            await rotate_context()
                         continue
 
-                    # Not an error: parse and proceed
                     total_rows, parsed_rows = parse_page(html)
                     pages_fetched += 1
                     total_scanned += total_rows
 
                     if total_rows == 0:
                         empty_pages.append(n)
-                        consecutive_empty += 1
+                        consec_empty += 1
                         (DEBUG_DIR / f"page-{n}-EMPTY.html").write_text(html, encoding="utf-8")
-                        # stop only after N consecutive true empties
-                        if consecutive_empty >= EMPTY_PAGE_TOLERANCE:
+                        recent.append(0)  # empty but not error
+                        if consec_empty >= EMPTY_PAGE_TOLERANCE:
                             page_ok = True
                             break
                     else:
-                        consecutive_empty = 0
+                        consec_empty = 0
                         all_parsed.extend(parsed_rows)
                         page_ok = True
-                    break
+                        recent.append(0)  # success
+
+                    break  # done with this page
 
                 except TimeoutError:
                     retries += 1
                     if retries > MAX_RETRIES_PER_PAGE:
                         error_pages.append(n)
+                        recent.append(1)
                         break
                     backoff = RETRY_BASE_MS * (2 ** (retries - 1)) + random.randint(0, 400)
                     await page.wait_for_timeout(backoff)
+                    if retries == 2:
+                        await rotate_context()
 
-            if not page_ok:
-                # give the server a breather before next page
-                await page.wait_for_timeout(RETRY_BASE_MS)
+            # error-storm bailout: too many errors in last window?
+            if len(recent) == ERROR_BAIL_WINDOW:
+                if (sum(recent) / len(recent)) >= ERROR_BAIL_THRESHOLD:
+                    # save a marker and bail
+                    (DEBUG_DIR / "ERROR_STORM.txt").write_text(
+                        f"High error rate in last {len(recent)} pages. Bailing early.\n", encoding="utf-8"
+                    )
+                    break
 
             if PAGE_DELAY_MS > 0:
                 await page.wait_for_timeout(PAGE_DELAY_MS)
 
-            # If we hit enough true empties in a row, bail out early
-            if consecutive_empty >= EMPTY_PAGE_TOLERANCE:
+            if consec_empty >= EMPTY_PAGE_TOLERANCE:
                 break
 
+        try:
+            await page.close(); await ctx.close()
+        except:
+            pass
         await browser.close()
 
     # Apply filters on parsed rows
     filtered_map = {}
     for r in all_parsed:
         if filter_row(r):
-            # canonicalize authority & normalized values for output
             auth_n = norm(r.get("authority"))
             r["authority"] = AUTHORITIES_NORM.get(auth_n, r.get("authority"))
             r["phase"] = norm(r.get("phase"))
@@ -393,38 +489,44 @@ async def main():
     delta_rows, updated_state, baseline = compute_delta(prev_state, filtered)
     save_state(updated_state)
 
-    # Notes block (shows backend errors, empties, baseline)
+    # Notes for the report
     notes = []
     if baseline:
         notes.append("Šis ir bāzes skrējiens. Izmaiņu saraksts tiks sūtīts no nākamā skrējiena.")
     if error_pages:
-        notes.append(f"Iespējami īslaicīgi servera traucējumi. Neizdevās ielādēt lapas: {', '.join(map(str, error_pages[:20]))}"
+        notes.append(f"Iespējami servera ierobežojumi (503). Lapas ar kļūdām (piemēri): {', '.join(map(str, error_pages[:20]))}"
                      + (" ..." if len(error_pages) > 20 else ""))
     if empty_pages:
         notes.append(f"Tika konstatētas {len(empty_pages)} tukšas lapas (bez rindām). Pēc {EMPTY_PAGE_TOLERANCE} pēc kārtas meklēšana tiek pārtraukta.")
+    elapsed = int((datetime.utcnow() - start).total_seconds() // 60)
+    notes.append(f"Skrējiena laiks: ~{elapsed} min; apmeklēšanas kārta: {PAGE_ORDER_MODE}"
+                 + (f" (solis {STRIDE})" if PAGE_ORDER_MODE=='strided' else ""))
 
     # Build BOTH reports (delta + full)
     delta_html = html_table_from_rows(delta_rows, include_change_col=True)
     full_html  = html_table_from_rows(filtered,   include_change_col=False)
 
     title_delta = "BIS – izmaiņu atskaite (jauni + stadijas izmaiņas)"
-    delta_doc = wrap_html(title_delta, delta_html, pages_fetched, total_scanned, notes=notes if delta_rows or baseline else None)
+    delta_doc = wrap_html(title_delta, delta_html, pages_fetched, total_scanned, notes=notes if (delta_rows or baseline or error_pages) else None)
     (REPORTS / "report_delta.html").write_text(delta_doc, encoding="utf-8")
 
     title_full = "BIS – pilns momentuzņēmums (atlasītie ieraksti)"
     full_doc = wrap_html(title_full, full_html, pages_fetched, total_scanned, notes=notes if not (delta_rows or baseline) else None)
     (REPORTS / "report_full.html").write_text(full_doc, encoding="utf-8")
 
-    # Useful log line
+    # Log
     print({
+        "pages_attempted": PAGES_TOTAL,
         "pages_success": pages_fetched,
         "rows_scanned": total_scanned,
         "rows_matched_full": len(filtered),
         "rows_reported_delta": len(delta_rows),
         "baseline": baseline,
-        "error_pages": error_pages[:10],
-        "error_pages_count": len(error_pages),
-        "empty_pages_count": len(empty_pages)
+        "errors_count": len(error_pages),
+        "empties_count": len(empty_pages),
+        "order": PAGE_ORDER_MODE,
+        "stride": STRIDE,
+        "minutes": elapsed
     })
 
 if __name__ == "__main__":
