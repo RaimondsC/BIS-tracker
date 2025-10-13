@@ -1,8 +1,8 @@
-name: "BIS Tracker (to page 3000 + failed-first)"
+name: "BIS Tracker (calmer pacing + cooldowns)"
 
 'on':
   schedule:
-    - cron: '0 3 * * 1-5'   # Weekdays 03:00 UTC ≈ 06:00 Riga
+    - cron: '10 3 * * 1-5'   # ~06:10 Riga (03:10 UTC)
   workflow_dispatch: {}
 
 jobs:
@@ -20,27 +20,35 @@ jobs:
           python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      - name: Scrape (ceiling to 3000; failed-pages-first)
-        env:
-          # Baseline to page 3000
-          TARGET_MAX_PAGE: "3000"
-          PAGES_PER_RUN: "3000"        # advance cursor per run (reduce if the site struggles)
-          FRONT_REFRESH_PAGES: "0"     # set to "10" or "20" if you want a small fresh sweep during baseline
+      - name: Random pre-start jitter (0–12 min)
+        run: |
+          S=$((RANDOM % 720))
+          echo "Sleeping $S seconds before scraping..."
+          sleep $S
 
-          # After baseline complete (delta sweeps each run)
-          DELTA_SCAN_PAGES: "3000"     # how many pages to scan in delta mode
+      - name: Scrape (ceiling 3000; failed-first; cooldowns)
+        env:
+          # Baseline target & windows
+          TARGET_MAX_PAGE: "3000"
+          PAGES_PER_RUN: "2500"         # my pick; reduce if server is grumpy
+          DELTA_SCAN_PAGES: "3000"
+          FRONT_REFRESH_PAGES: "0"
 
           # Pacing & errors
-          PAGE_DELAY_MS: "200"
-          MAX_RETRIES_PER_PAGE: "1"
+          PAGE_DELAY_MS: "400"
+          MAX_RETRIES_PER_PAGE: "0"
           RETRY_BASE_MS: "2000"
-          ERROR_BAIL_WINDOW: "60"
-          ERROR_BAIL_THRESHOLD: "0.8"
           GLOBAL_MINUTES_BUDGET: "75"
           CONTEXT_ROTATE_EVERY: "350"
 
-          # Failed pages queue behavior
-          FAILED_PAGE_RETRY_LIMIT: "200"
+          # Error-storm controls
+          ERROR_BAIL_WINDOW: "30"
+          ERROR_BAIL_THRESHOLD: "0.8"
+          COOLDOWN_ON_STORM_MINUTES: "9"
+          STORM_COOLDOWNS_MAX: "2"
+
+          # Failed pages queue
+          FAILED_PAGE_RETRY_LIMIT: "400"
           FAILED_PAGE_MAX_ATTEMPTS: "8"
         run: |
           python scraper.py
@@ -71,7 +79,6 @@ jobs:
           fi
           echo "complete=$VAL" >> "$GITHUB_OUTPUT"
 
-      # During baseline: send FULL + DELTA
       - name: Email (baseline building — full + delta)
         if: steps.baseline.outputs.complete == 'no'
         uses: dawidd6/action-send-mail@v3
@@ -94,7 +101,6 @@ jobs:
             reports/report_full.html
             reports/report_delta.html
 
-      # After baseline: send DELTA only
       - name: Email (baseline complete — delta only)
         if: steps.baseline.outputs.complete == 'yes'
         uses: dawidd6/action-send-mail@v3
