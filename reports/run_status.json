@@ -1,140 +1,12 @@
 {
-  "baseline_run": true,
+  "baseline_run": false,
   "baseline_complete": false,
   "pages_scanned_this_run": 40,
-  "start_page": 1,
-  "end_page_goal": 3000,
-  "next_page": 88,
+  "start_page": 88,
+  "end_page_goal": 3087,
+  "next_page": 128,
   "failed_pages_queue": {
     "pages": [
-      {
-        "n": 33,
-        "attempts": 1
-      },
-      {
-        "n": 34,
-        "attempts": 1
-      },
-      {
-        "n": 35,
-        "attempts": 1
-      },
-      {
-        "n": 36,
-        "attempts": 1
-      },
-      {
-        "n": 38,
-        "attempts": 1
-      },
-      {
-        "n": 39,
-        "attempts": 1
-      },
-      {
-        "n": 40,
-        "attempts": 1
-      },
-      {
-        "n": 41,
-        "attempts": 1
-      },
-      {
-        "n": 42,
-        "attempts": 1
-      },
-      {
-        "n": 43,
-        "attempts": 1
-      },
-      {
-        "n": 45,
-        "attempts": 1
-      },
-      {
-        "n": 46,
-        "attempts": 1
-      },
-      {
-        "n": 47,
-        "attempts": 1
-      },
-      {
-        "n": 48,
-        "attempts": 1
-      },
-      {
-        "n": 49,
-        "attempts": 1
-      },
-      {
-        "n": 50,
-        "attempts": 1
-      },
-      {
-        "n": 52,
-        "attempts": 1
-      },
-      {
-        "n": 53,
-        "attempts": 1
-      },
-      {
-        "n": 54,
-        "attempts": 1
-      },
-      {
-        "n": 55,
-        "attempts": 1
-      },
-      {
-        "n": 56,
-        "attempts": 1
-      },
-      {
-        "n": 57,
-        "attempts": 1
-      },
-      {
-        "n": 59,
-        "attempts": 1
-      },
-      {
-        "n": 60,
-        "attempts": 1
-      },
-      {
-        "n": 61,
-        "attempts": 1
-      },
-      {
-        "n": 62,
-        "attempts": 1
-      },
-      {
-        "n": 63,
-        "attempts": 1
-      },
-      {
-        "n": 64,
-        "attempts": 1
-      },
-      {
-        "n": 66,
-        "attempts": 1
-      },
-      {
-        "n": 67,
-        "attempts": 1
-      },
-      {
-        "n": 68,
-        "attempts": 1
-      },
-      {
-        "n": 69,
-        "attempts": 1
-      },
       {
         "n": 70,
         "attempts": 1
@@ -153,10 +25,6 @@
       },
       {
         "n": 75,
-        "attempts": 1
-      },
-      {
-        "n": 76,
         "attempts": 1
       },
       {
@@ -184,10 +52,6 @@
         "attempts": 1
       },
       {
-        "n": 84,
-        "attempts": 1
-      },
-      {
         "n": 85,
         "attempts": 1
       },
@@ -197,6 +61,142 @@
       },
       {
         "n": 88,
+        "attempts": 1
+      },
+      {
+        "n": 89,
+        "attempts": 1
+      },
+      {
+        "n": 90,
+        "attempts": 1
+      },
+      {
+        "n": 91,
+        "attempts": 1
+      },
+      {
+        "n": 93,
+        "attempts": 1
+      },
+      {
+        "n": 94,
+        "attempts": 1
+      },
+      {
+        "n": 95,
+        "attempts": 1
+      },
+      {
+        "n": 96,
+        "attempts": 1
+      },
+      {
+        "n": 97,
+        "attempts": 1
+      },
+      {
+        "n": 98,
+        "attempts": 1
+      },
+      {
+        "n": 100,
+        "attempts": 1
+      },
+      {
+        "n": 101,
+        "attempts": 1
+      },
+      {
+        "n": 102,
+        "attempts": 1
+      },
+      {
+        "n": 103,
+        "attempts": 1
+      },
+      {
+        "n": 104,
+        "attempts": 1
+      },
+      {
+        "n": 105,
+        "attempts": 1
+      },
+      {
+        "n": 107,
+        "attempts": 1
+      },
+      {
+        "n": 108,
+        "attempts": 1
+      },
+      {
+        "n": 109,
+        "attempts": 1
+      },
+      {
+        "n": 110,
+        "attempts": 1
+      },
+      {
+        "n": 111,
+        "attempts": 1
+      },
+      {
+        "n": 112,
+        "attempts": 1
+      },
+      {
+        "n": 114,
+        "attempts": 1
+      },
+      {
+        "n": 115,
+        "attempts": 1
+      },
+      {
+        "n": 116,
+        "attempts": 1
+      },
+      {
+        "n": 117,
+        "attempts": 1
+      },
+      {
+        "n": 118,
+        "attempts": 1
+      },
+      {
+        "n": 119,
+        "attempts": 1
+      },
+      {
+        "n": 121,
+        "attempts": 1
+      },
+      {
+        "n": 122,
+        "attempts": 1
+      },
+      {
+        "n": 123,
+        "attempts": 1
+      },
+      {
+        "n": 124,
+        "attempts": 1
+      },
+      {
+        "n": 125,
+        "attempts": 1
+      },
+      {
+        "n": 126,
+        "attempts": 1
+      },
+      {
+        "n": 128,
         "attempts": 1
       }
     ]
