@@ -8,28 +8,28 @@ import pandas as pd
 BASE = "https://bis.gov.lv"
 LIST_URL = BASE + "/bisp/lv/planned_constructions/list?order=case_number&direction=desc&page={page}"
 
-# Build-to-ceiling baseline (sequential) then delta
-TARGET_MAX_PAGE = int(os.getenv("TARGET_MAX_PAGE", "3000"))  # stop baseline at this page, then wrap to 1
-PAGES_PER_RUN   = int(os.getenv("PAGES_PER_RUN", "1200"))    # pages to advance cursor while building baseline
-DELTA_SCAN_PAGES = int(os.getenv("DELTA_SCAN_PAGES", "3000")) # pages to scan per run after baseline complete
-
-# Optional front refresh (only during baseline to catch very fresh items)
-FRONT_REFRESH_PAGES = int(os.getenv("FRONT_REFRESH_PAGES", "0"))  # e.g., "20"; set "0" to disable
+# Build baseline up to ceiling, then delta
+TARGET_MAX_PAGE   = int(os.getenv("TARGET_MAX_PAGE", "3000"))   # stop baseline at this page, then wrap to 1
+PAGES_PER_RUN     = int(os.getenv("PAGES_PER_RUN", "2500"))     # advance cursor per baseline run
+DELTA_SCAN_PAGES  = int(os.getenv("DELTA_SCAN_PAGES", "3000"))  # pages to scan per run after baseline complete
+FRONT_REFRESH_PAGES = int(os.getenv("FRONT_REFRESH_PAGES", "0"))  # e.g., "20" to lightly refresh very front pages
 
 # Politeness / robustness
-PAGE_DELAY_MS = int(os.getenv("PAGE_DELAY_MS", "200"))
-MAX_RETRIES_PER_PAGE = int(os.getenv("MAX_RETRIES_PER_PAGE", "1"))   # you observed >1 rarely helps
-RETRY_BASE_MS = int(os.getenv("RETRY_BASE_MS", "2000"))
+PAGE_DELAY_MS        = int(os.getenv("PAGE_DELAY_MS", "400"))
+MAX_RETRIES_PER_PAGE = int(os.getenv("MAX_RETRIES_PER_PAGE", "0"))   # retries beyond 0 rarely help here
+RETRY_BASE_MS        = int(os.getenv("RETRY_BASE_MS", "2000"))
 GLOBAL_MINUTES_BUDGET = int(os.getenv("GLOBAL_MINUTES_BUDGET", "75"))
 CONTEXT_ROTATE_EVERY = int(os.getenv("CONTEXT_ROTATE_EVERY", "350"))
 
-# Error-storm bailout
-ERROR_BAIL_WINDOW = int(os.getenv("ERROR_BAIL_WINDOW", "60"))
-ERROR_BAIL_THRESHOLD = float(os.getenv("ERROR_BAIL_THRESHOLD", "0.80"))
+# Error-storm handling
+ERROR_BAIL_WINDOW     = int(os.getenv("ERROR_BAIL_WINDOW", "30"))   # pages to consider
+ERROR_BAIL_THRESHOLD  = float(os.getenv("ERROR_BAIL_THRESHOLD", "0.80"))  # >=80% errors -> storm
+COOLDOWN_ON_STORM_MINUTES = int(os.getenv("COOLDOWN_ON_STORM_MINUTES", "9"))
+STORM_COOLDOWNS_MAX   = int(os.getenv("STORM_COOLDOWNS_MAX", "2"))
 
 # Failed-pages-first queue
-FAILED_PAGE_RETRY_LIMIT   = int(os.getenv("FAILED_PAGE_RETRY_LIMIT", "200"))  # how many to try first each run
-FAILED_PAGE_MAX_ATTEMPTS  = int(os.getenv("FAILED_PAGE_MAX_ATTEMPTS", "8"))   # then drop from queue
+FAILED_PAGE_RETRY_LIMIT  = int(os.getenv("FAILED_PAGE_RETRY_LIMIT", "400"))  # how many to try first each run
+FAILED_PAGE_MAX_ATTEMPTS = int(os.getenv("FAILED_PAGE_MAX_ATTEMPTS", "8"))   # then drop from queue
 
 # Files/dirs
 ROOT = pathlib.Path(".")
@@ -39,12 +39,12 @@ STATE_DIR = ROOT / "state"; STATE_DIR.mkdir(parents=True, exist_ok=True)
 STATE_FILE = STATE_DIR / "state.json"               # seen rows (for delta)
 CURSOR_FILE = STATE_DIR / "cursor.json"             # next_page + baseline_complete
 FAILED_FILE = STATE_DIR / "failed_pages.json"       # pages to retry first (with attempts)
-RUN_STATUS = REPORTS / "run_status.json"
-BASELINE_FLAG = REPORTS / "baseline_complete.flag"  # "yes" or "no"
+RUN_STATUS  = REPORTS / "run_status.json"
+BASELINE_FLAG = REPORTS / "baseline_complete.flag"  # "yes" / "no"
 
 # === Filters ===
 AUTHORITIES_WHITELIST = {
-    "RĪGAS VALSTSPILSĒTAS PAŠVALDĪBAS PILSĒTAS ATTĪSTĪBAS DEPARTAMENTS",
+    "RĪGAS VALSTSPILSĪTAS PAŠVALDĪBAS PILSĒTAS ATTĪSTĪBAS DEPARTAMENTS",
     "Ādažu novada būvvalde",
     "Saulkrastu novada būvvalde",
     "Ropažu novada pašvaldības būvvalde",
@@ -172,7 +172,6 @@ def save_state(state: dict):
     dump_json(STATE_FILE, state)
 
 def load_cursor():
-    # next_page starts at 1; baseline_complete flips to true once we pass TARGET_MAX_PAGE
     return load_json(CURSOR_FILE, {"next_page": 1, "baseline_complete": False})
 
 def save_cursor(c):
@@ -198,7 +197,7 @@ def save_failed_queue(queue):
 
 def push_failed_page(queue, n):
     if n > TARGET_MAX_PAGE:
-        return  # we don't care beyond ceiling
+        return
     for item in queue["pages"]:
         if item["n"] == n:
             item["attempts"] = min(item.get("attempts", 0) + 1, FAILED_PAGE_MAX_ATTEMPTS)
@@ -206,14 +205,13 @@ def push_failed_page(queue, n):
     queue["pages"].append({"n": n, "attempts": 1})
 
 def pop_failed_batch(queue, limit):
-    # take the oldest 'limit' pages (stable order)
     batch, rest = [], []
     for item in queue["pages"]:
         if len(batch) < limit:
             if int(item.get("n", 0)) <= TARGET_MAX_PAGE:
                 batch.append(item)
             else:
-                rest.append(item)  # ignore > ceiling
+                rest.append(item)
         else:
             rest.append(item)
     queue["pages"] = rest
@@ -339,32 +337,27 @@ async def main():
         baseline_complete = bool(cursor.get("baseline_complete", False))
         next_page = int(cursor.get("next_page", 1))
 
-        # Build the worklist:
+        # Build worklist
         failed_queue = load_failed_queue()
         failed_batch = [i["n"] for i in pop_failed_batch(failed_queue, FAILED_PAGE_RETRY_LIMIT)]
 
-        worklist = []
-        visited = set()
-
+        worklist, visited = [], set()
         # 1) failed pages first (within ceiling)
         for n in failed_batch:
             if 1 <= int(n) <= TARGET_MAX_PAGE and n not in visited:
                 worklist.append(int(n)); visited.add(int(n))
-
-        # 2) front refresh only while building baseline
+        # 2) optional front refresh during baseline
         if not baseline_complete and FRONT_REFRESH_PAGES > 0:
             for n in range(1, min(FRONT_REFRESH_PAGES, TARGET_MAX_PAGE) + 1):
                 if n not in visited:
                     worklist.append(n); visited.add(n)
-
-        # 3) sequential window: baseline vs delta
+        # 3) sequential window (baseline vs delta)
         if baseline_complete:
             seq_start = 1
             seq_end   = min(TARGET_MAX_PAGE, DELTA_SCAN_PAGES)
         else:
             seq_start = max(1, next_page)
             seq_end   = min(TARGET_MAX_PAGE, seq_start + PAGES_PER_RUN - 1)
-
         for n in range(seq_start, seq_end + 1):
             if n not in visited:
                 worklist.append(n); visited.add(n)
@@ -375,7 +368,8 @@ async def main():
         consec_empty = 0
         error_pages, empty_pages = [], []
         recent_flags = collections.deque(maxlen=ERROR_BAIL_WINDOW)  # 1=error, 0=ok
-        seq_last_scanned = seq_start - 1  # track how far the *sequential* part progressed
+        seq_last_scanned = seq_start - 1
+        storm_cooldowns_used = 0
 
         async def rotate_context():
             nonlocal ctx, page
@@ -394,7 +388,7 @@ async def main():
                         await page.wait_for_selector(".flextable__row", timeout=2500)
                     except TimeoutError:
                         pass
-                    # cookies
+                    # cookies banner
                     try:
                         for t in ["Apstiprināt", "Apstiprināt izvēlētās", "Apstiprināt visas", "Piekrītu"]:
                             btn = page.get_by_text(t, exact=False).first
@@ -431,13 +425,72 @@ async def main():
                         await rotate_context()
             return "error", 0, []
 
-        all_parsed = []
-        for idx, n in enumerate(worklist, start=1):
+        async def maybe_cooldown(context_label: str) -> bool:
+            """Return True if we cooled down (and should continue), False if we must bail."""
+            nonlocal storm_cooldowns_used, recent_flags
+            if len(recent_flags) == ERROR_BAIL_WINDOW and (sum(recent_flags) / len(recent_flags)) >= ERROR_BAIL_THRESHOLD:
+                if storm_cooldowns_used < STORM_COOLDOWNS_MAX and datetime.utcnow() + timedelta(minutes=COOLDOWN_ON_STORM_MINUTES) < deadline:
+                    storm_cooldowns_used += 1
+                    (DEBUG_DIR / f"COOLDOWN_{storm_cooldowns_used}_{context_label}.txt").write_text(
+                        f"Error storm detected (≥{ERROR_BAIL_THRESHOLD*100:.0f}% over {ERROR_BAIL_WINDOW} pages). "
+                        f"Cooling down for {COOLDOWN_ON_STORM_MINUTES} minutes.",
+                        encoding="utf-8"
+                    )
+                    await page.wait_for_timeout(COOLDOWN_ON_STORM_MINUTES * 60 * 1000)
+                    await rotate_context()
+                    recent_flags.clear()
+                    return True
+                else:
+                    (DEBUG_DIR / "ERROR_STORM.txt").write_text(
+                        f"High error rate in last {ERROR_BAIL_WINDOW} pages (≥{ERROR_BAIL_THRESHOLD*100:.0f}%). Bailing.",
+                        encoding="utf-8"
+                    )
+                    return False
+            return True
+
+        # 1) failed pages first (do not let empties stop; they don't indicate end)
+        visited_set = set()
+        for n in [x for x in worklist if x in failed_batch]:
             if datetime.utcnow() >= deadline:
                 break
             status, rows, parsed = await fetch_and_parse(n)
+            visited_set.add(n)
 
-            is_in_sequential = (seq_start <= n <= seq_end)
+            if status == "error":
+                push_failed_page(failed_queue, n)
+                error_pages.append(n)
+                recent_flags.append(1)
+            else:
+                pages_fetched += 1
+                total_scanned += rows
+                if status == "ok":
+                    all_rows = parsed
+                    # accumulate
+                    if 'all_parsed' in locals():
+                        all_parsed.extend(all_rows)
+                    else:
+                        all_parsed = list(all_rows)
+                recent_flags.append(0)
+
+            if PAGE_DELAY_MS > 0:
+                await page.wait_for_timeout(PAGE_DELAY_MS)
+
+            cont = await maybe_cooldown("failed-first")
+            if not cont:
+                break
+
+        # ensure accumulator exists
+        if 'all_parsed' not in locals():
+            all_parsed = []
+
+        # 2) sequential window (empties count toward end-of-list during baseline)
+        n = seq_start
+        while n <= seq_end and datetime.utcnow() < deadline:
+            if n in visited_set:
+                n += 1
+                continue
+
+            status, rows, parsed = await fetch_and_parse(n)
 
             if status == "error":
                 push_failed_page(failed_queue, n)
@@ -446,27 +499,28 @@ async def main():
             elif status == "empty":
                 empty_pages.append(n)
                 recent_flags.append(0)
-                if is_in_sequential:
+                pages_fetched += 1
+                if not baseline_complete:
                     consec_empty += 1
+                    if consec_empty >= 2:
+                        baseline_complete = True
+                        break
             else:
-                consec_empty = 0 if is_in_sequential else consec_empty
+                consec_empty = 0 if not baseline_complete else consec_empty
+                pages_fetched += 1
                 total_scanned += rows
                 all_parsed.extend(parsed)
                 recent_flags.append(0)
-
-            pages_fetched += 1
-            if is_in_sequential and status != "error":
                 seq_last_scanned = max(seq_last_scanned, n)
 
             if PAGE_DELAY_MS > 0:
                 await page.wait_for_timeout(PAGE_DELAY_MS)
 
-            if len(recent_flags) == ERROR_BAIL_WINDOW and (sum(recent_flags) / len(recent_flags)) >= ERROR_BAIL_THRESHOLD:
-                (DEBUG_DIR / "ERROR_STORM.txt").write_text(
-                    f"High error rate in last {ERROR_BAIL_WINDOW} pages (≥{ERROR_BAIL_THRESHOLD*100:.0f}%).",
-                    encoding="utf-8"
-                )
+            cont = await maybe_cooldown("sequential")
+            if not cont:
                 break
+
+            n += 1
 
         try:
             await page.close(); await ctx.close()
@@ -476,18 +530,15 @@ async def main():
 
     # Next cursor
     if not baseline_complete:
-        # advance only based on sequential progress
         if seq_last_scanned >= seq_start:
             nxt = seq_last_scanned + 1
         else:
-            nxt = next_page  # no sequential progress
-        # wrap at ceiling
+            nxt = next_page
         if nxt > TARGET_MAX_PAGE:
             baseline_complete = True
             nxt = 1
         save_cursor({"next_page": nxt, "baseline_complete": baseline_complete})
     else:
-        # delta mode keeps baseline_complete = True; cursor not used
         save_cursor({"next_page": 1, "baseline_complete": True})
 
     save_failed_queue(failed_queue)
@@ -511,21 +562,22 @@ async def main():
     # Notes
     notes = []
     if not baseline_complete:
-        notes.append(f"Bāzes momentuzņēmums līdz {TARGET_MAX_PAGE}. lappusei tiek veidots vairākos skrējienos (kursors turpinās nākamajā reizē).")
+        notes.append(f"Bāzes momentuzņēmums līdz {TARGET_MAX_PAGE}. lpp. tiek veidots vairākos skrējienos.")
         if FRONT_REFRESH_PAGES > 0:
-            notes.append(f"Katrā skrējienā papildus pārbaudītas pirmās {FRONT_REFRESH_PAGES} lapas (svaigākie ieraksti).")
+            notes.append(f"Katrā skrējienā papildus pārbaudītas pirmās {FRONT_REFRESH_PAGES} lapas.")
     else:
-        notes.append(f"Baseline līdz {TARGET_MAX_PAGE}. lappusei pabeigts. Šajā skrējienā skenētas pirmās {min(TARGET_MAX_PAGE, DELTA_SCAN_PAGES)} lapas (delta).")
+        notes.append(f"Baseline līdz {TARGET_MAX_PAGE}. lpp. pabeigts. Šajā skrējienā skenētas pirmās {min(TARGET_MAX_PAGE, DELTA_SCAN_PAGES)} lapas (delta).")
     if error_pages:
-        notes.append(f"Servera kļūdas lapās: {', '.join(map(str, error_pages[:20]))}" + (" ..." if len(error_pages)>20 else ""))
+        notes.append(f"Servera kļūdas lapās: {', '.join(map(str, error_pages[:20]))}" + (" ..." if len(error_pages) > 20 else ""))
     if empty_pages:
         notes.append(f"Tika konstatētas {len(empty_pages)} tukšas lapas.")
     elapsed = int((datetime.utcnow() - start).total_seconds() // 60)
     notes.append(f"Skrējiena laiks: ~{elapsed} min.")
 
     # Reports
-    delta_html = html_table_from_rows(delta_rows, include_change_col=True)
-    full_html  = html_table_from_rows(filtered,   include_change_col=False)
+    def html_table(rows, include_change): return html_table_from_rows(rows, include_change)
+    delta_html = html_table(delta_rows, include_change=True)
+    full_html  = html_table(filtered, include_change=False)
 
     title_delta = "BIS – izmaiņu atskaite (jauni + stadijas izmaiņas)"
     delta_doc = wrap_html(title_delta, delta_html, pages_fetched, total_scanned,
@@ -545,7 +597,8 @@ async def main():
         "seq_end": seq_end,
         "seq_last_scanned": seq_last_scanned,
         "next_page": load_json(CURSOR_FILE, {}).get("next_page", 1),
-        "failed_queue_size": len(load_json(FAILED_FILE, {"pages": []}).get("pages", []))
+        "failed_queue_size": len(load_json(FAILED_FILE, {"pages": []}).get("pages", [])),
+        "storm_cooldowns_used": storm_cooldowns_used
     }
     RUN_STATUS.write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding="utf-8")
     BASELINE_FLAG.write_text("yes" if baseline_complete else "no", encoding="utf-8")
