@@ -1,8 +1,8 @@
-name: "BIS Tracker (cursor + failed-pages-first)"
+name: "BIS Tracker (to page 3000 + failed-first)"
 
 'on':
   schedule:
-    - cron: '0 3 * * 1-5'   # Weekdays 03:00 UTC ≈ 06:00 Riga in summer
+    - cron: '0 3 * * 1-5'   # Weekdays 03:00 UTC ≈ 06:00 Riga
   workflow_dispatch: {}
 
 jobs:
@@ -20,29 +20,32 @@ jobs:
           python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      - name: Scrape (sequential cursor, failed-pages-first)
+      - name: Scrape (ceiling to 3000; failed-pages-first)
         env:
-          # Baseline builder (per run)
-          PAGES_PER_RUN: "3000"
-          # Delta sweeps (after baseline_complete = yes)
-          DELTA_SCAN_PAGES: "3000"
-          # Pacing
-          PAGE_DELAY_MS: "250"
-          # Error handling
+          # Baseline to page 3000
+          TARGET_MAX_PAGE: "3000"
+          PAGES_PER_RUN: "3000"        # advance cursor per run (reduce if the site struggles)
+          FRONT_REFRESH_PAGES: "0"     # set to "10" or "20" if you want a small fresh sweep during baseline
+
+          # After baseline complete (delta sweeps each run)
+          DELTA_SCAN_PAGES: "3000"     # how many pages to scan in delta mode
+
+          # Pacing & errors
+          PAGE_DELAY_MS: "200"
           MAX_RETRIES_PER_PAGE: "1"
-          RETRY_BASE_MS: "2500"
-          EMPTY_PAGE_TOLERANCE: "2"
+          RETRY_BASE_MS: "2000"
           ERROR_BAIL_WINDOW: "60"
           ERROR_BAIL_THRESHOLD: "0.8"
           GLOBAL_MINUTES_BUDGET: "75"
           CONTEXT_ROTATE_EVERY: "350"
-          # Failed pages queue
+
+          # Failed pages queue behavior
           FAILED_PAGE_RETRY_LIMIT: "200"
           FAILED_PAGE_MAX_ATTEMPTS: "8"
         run: |
           python scraper.py
 
-      - name: Upload debug (first pages + error/empty markers)
+      - name: Upload debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -68,7 +71,7 @@ jobs:
           fi
           echo "complete=$VAL" >> "$GITHUB_OUTPUT"
 
-      # Email while baseline is NOT complete: send FULL + DELTA
+      # During baseline: send FULL + DELTA
       - name: Email (baseline building — full + delta)
         if: steps.baseline.outputs.complete == 'no'
         uses: dawidd6/action-send-mail@v3
@@ -82,16 +85,16 @@ jobs:
           from: ${{ secrets.MAIL_FROM }}
           secure: false
           html_body: |
-            <p>Sveiki! Turpinās bāzes momentuzņēmuma veidošana. Pielikumā:</p>
+            <p>Sveiki! Turpinās bāzes momentuzņēmums līdz 3000. lapai. Pielikumā:</p>
             <ul>
-              <li><code>report_full.html</code> – šī skrējiena pilns atlasīto ierakstu saraksts</li>
-              <li><code>report_delta.html</code> – tikai jauni ieraksti un stadiju izmaiņas</li>
+              <li><code>report_full.html</code> — šī skrējiena pilnais atlasīto ierakstu saraksts</li>
+              <li><code>report_delta.html</code> — tikai jauni ieraksti un stadiju izmaiņas</li>
             </ul>
           attachments: |
             reports/report_full.html
             reports/report_delta.html
 
-      # Email after baseline complete: send DELTA only
+      # After baseline: send DELTA only
       - name: Email (baseline complete — delta only)
         if: steps.baseline.outputs.complete == 'yes'
         uses: dawidd6/action-send-mail@v3
