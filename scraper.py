@@ -10,25 +10,25 @@ LIST_URL = BASE + "/bisp/lv/planned_constructions/list?order=case_number&directi
 
 # Build baseline up to ceiling, then delta
 TARGET_MAX_PAGE   = int(os.getenv("TARGET_MAX_PAGE", "3000"))   # stop baseline at this page, then wrap to 1
-PAGES_PER_RUN     = int(os.getenv("PAGES_PER_RUN", "2500"))     # advance cursor per baseline run
+PAGES_PER_RUN     = int(os.getenv("PAGES_PER_RUN", "3000"))     # advance cursor per baseline run
 DELTA_SCAN_PAGES  = int(os.getenv("DELTA_SCAN_PAGES", "3000"))  # pages to scan per run after baseline complete
 FRONT_REFRESH_PAGES = int(os.getenv("FRONT_REFRESH_PAGES", "0"))  # e.g., "20" to lightly refresh very front pages
 
 # Politeness / robustness
-PAGE_DELAY_MS        = int(os.getenv("PAGE_DELAY_MS", "400"))
+PAGE_DELAY_MS        = int(os.getenv("PAGE_DELAY_MS", "500"))
 MAX_RETRIES_PER_PAGE = int(os.getenv("MAX_RETRIES_PER_PAGE", "0"))   # retries beyond 0 rarely help here
 RETRY_BASE_MS        = int(os.getenv("RETRY_BASE_MS", "2000"))
 GLOBAL_MINUTES_BUDGET = int(os.getenv("GLOBAL_MINUTES_BUDGET", "75"))
 CONTEXT_ROTATE_EVERY = int(os.getenv("CONTEXT_ROTATE_EVERY", "350"))
 
 # Error-storm handling
-ERROR_BAIL_WINDOW     = int(os.getenv("ERROR_BAIL_WINDOW", "30"))   # pages to consider
+ERROR_BAIL_WINDOW     = int(os.getenv("ERROR_BAIL_WINDOW", "20"))   # pages to consider
 ERROR_BAIL_THRESHOLD  = float(os.getenv("ERROR_BAIL_THRESHOLD", "0.80"))  # >=80% errors -> storm
-COOLDOWN_ON_STORM_MINUTES = int(os.getenv("COOLDOWN_ON_STORM_MINUTES", "9"))
+COOLDOWN_ON_STORM_MINUTES = int(os.getenv("COOLDOWN_ON_STORM_MINUTES", "12"))
 STORM_COOLDOWNS_MAX   = int(os.getenv("STORM_COOLDOWNS_MAX", "2"))
 
 # Failed-pages-first queue
-FAILED_PAGE_RETRY_LIMIT  = int(os.getenv("FAILED_PAGE_RETRY_LIMIT", "400"))  # how many to try first each run
+FAILED_PAGE_RETRY_LIMIT  = int(os.getenv("FAILED_PAGE_RETRY_LIMIT", "200"))  # how many to try first each run
 FAILED_PAGE_MAX_ATTEMPTS = int(os.getenv("FAILED_PAGE_MAX_ATTEMPTS", "8"))   # then drop from queue
 
 # Files/dirs
