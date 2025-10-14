@@ -3263,7 +3263,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/890290",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-890283-118790": {
@@ -3280,12 +3280,12 @@
   "BIS-BL-890277-15805": {
     "bis_number": "BIS-BL-890277-15805",
     "authority": "Ķekavas novada pašvaldības būvvalde",
-    "address": "",
-    "object": "Elektroapgādes kabelis",
+    "address": "Mēness iela 15, Lielvārži, Ķekavas pag., Ķekavas nov., LV-2123",
+    "object": "Sadalne",
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/890277",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-890241-118791": {
@@ -3315,10 +3315,10 @@
     "authority": "Mārupes novada Būvvalde",
     "address": "Ritenieku iela 2, Vētras, Mārupes pag., Mārupes nov., LV-2167",
     "object": "Divģimeņu dzīvojamā māja",
-    "phase": "Iecere",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889738",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-889717-13726": {
@@ -3329,7 +3329,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889717",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-889712-118835": {
@@ -3362,7 +3362,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889700",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-889697-12676": {
@@ -3373,7 +3373,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889697",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-889230-118575": {
@@ -3395,7 +3395,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889203",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-888621-117773": {
@@ -4616,7 +4616,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/890396",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-890381-118023": {
@@ -4660,7 +4660,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/890347",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-890340-119086": {
@@ -4693,7 +4693,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/890326",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-890322-118168": {
@@ -4715,18 +4715,18 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/890311",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-890302-15847": {
     "bis_number": "BIS-BL-890302-15847",
     "authority": "Ķekavas novada pašvaldības būvvalde",
     "address": "Rozenieku iela 32, Jaunsils, Ķekavas pag., Ķekavas nov., LV-2123",
-    "object": "Palīgēka",
+    "object": "Savrupmāja",
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/890302",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-890300-15733": {
@@ -4737,7 +4737,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/890300",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-890198-117981": {
@@ -4759,7 +4759,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/890175",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-890158-118285": {
@@ -4858,7 +4858,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889568",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-889536-118721": {
@@ -4880,7 +4880,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Vienkāršota atjaunošana",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889531",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-889528-12285": {
@@ -4891,7 +4891,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889528",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-888887-12199": {
@@ -4902,7 +4902,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888887",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-888871-15666": {
@@ -4913,7 +4913,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888871",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-888868-16595": {
@@ -4924,7 +4924,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888868",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-888858-13715": {
@@ -4935,7 +4935,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888858",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-888846-118026": {
@@ -4979,18 +4979,18 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888101",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-887689-22756": {
     "bis_number": "BIS-BL-887689-22756",
     "authority": "Jūrmalas Būvvalde",
     "address": "Sudraba iela 3A, Jūrmala, LV-2015",
-    "object": "-",
+    "object": "Dzīvojamā ēka",
     "phase": "Iecere",
-    "construction_type": "Pārbūve",
+    "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887689",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-887647-12302": {
@@ -5001,7 +5001,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887647",
-    "last_seen": "2025-10-13",
+    "last_seen": "2025-10-14",
     "first_seen": "2025-10-13"
   },
   "BIS-BL-887593-119139": {
@@ -5146,5 +5146,940 @@
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/885686",
     "last_seen": "2025-10-13",
     "first_seen": "2025-10-13"
+  },
+  "BIS-BL-889963-22983": {
+    "bis_number": "BIS-BL-889963-22983",
+    "authority": "Jūrmalas Būvvalde",
+    "address": "18. līnija 1A, Jūrmala, LV-2010",
+    "object": "Dzīvojamā māja - savrupmāja, 18. līnija 1A",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Vienkāršota atjaunošana",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889963",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889942-20991": {
+    "bis_number": "BIS-BL-889942-20991",
+    "authority": "Siguldas novada būvvalde",
+    "address": "Leona Paegles iela 3, Sigulda, Siguldas nov., LV-2150",
+    "object": "Ārējā elektroapgāde",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889942",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889912-15662": {
+    "bis_number": "BIS-BL-889912-15662",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "Rīgas iela 7, Baldone, Ķekavas nov., LV-2125",
+    "object": "Ugunsdzēsības dīķis",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889912",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889865-12244": {
+    "bis_number": "BIS-BL-889865-12244",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Saulītes iela 53, Carnikava, Carnikavas pag., Ādažu nov., LV-2163",
+    "object": "Dārza māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889865",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889824-13775": {
+    "bis_number": "BIS-BL-889824-13775",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Dambju iela 26, Brīvkalni, Babītes pag., Mārupes nov., LV-2107",
+    "object": "Dzīvojamās mājas jaunbūve",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889824",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889806-7084": {
+    "bis_number": "BIS-BL-889806-7084",
+    "authority": "Saulkrastu novada būvvalde",
+    "address": "\"Vecsuliņas\", Loja, Sējas pag., Saulkrastu nov., LV-2142",
+    "object": "Zemsprieguma kabeļu elektrolīnijas",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889806",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889794-11132": {
+    "bis_number": "BIS-BL-889794-11132",
+    "authority": "Salaspils novada pašvaldības iestāde \"Salaspils novada Būvvalde\"",
+    "address": "Saulrietu iela 36, Salaspils, Salaspils nov., LV-2121",
+    "object": "Dzīvojamā ēka",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889794",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889793-12225": {
+    "bis_number": "BIS-BL-889793-12225",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Linu iela 13, Carnikava, Carnikavas pag., Ādažu nov., LV-2163",
+    "object": "Dzīvojamā māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889793",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889518-11261": {
+    "bis_number": "BIS-BL-889518-11261",
+    "authority": "Salaspils novada pašvaldības iestāde \"Salaspils novada Būvvalde\"",
+    "address": "Mētru iela 9, Salaspils, Salaspils nov., LV-2121",
+    "object": "Dzīvojamā māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889518",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889424-12226": {
+    "bis_number": "BIS-BL-889424-12226",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Smilgu 2. šķērslīnija 2, Ādaži, Ādažu nov., LV-2164",
+    "object": "Pirts",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889424",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889367-15654": {
+    "bis_number": "BIS-BL-889367-15654",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "Rakaru iela 12A, Krogsils, Ķekavas pag., Ķekavas nov., LV-2111",
+    "object": "Dzīvojamā ēka",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889367",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889341-20796": {
+    "bis_number": "BIS-BL-889341-20796",
+    "authority": "Siguldas novada būvvalde",
+    "address": "",
+    "object": "Saimniecības eka2",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889341",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889254-22800": {
+    "bis_number": "BIS-BL-889254-22800",
+    "authority": "Jūrmalas Būvvalde",
+    "address": "Druvu iela 21, Jūrmala, LV-2008",
+    "object": "Daudzdzīvokļu dzīvojamā ēka Nr.001",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Vienkāršota pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889254",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889251-12341": {
+    "bis_number": "BIS-BL-889251-12341",
+    "authority": "Ropažu novada pašvaldības būvvalde",
+    "address": "Jaunkrastu iela 24, Ropaži, Ropažu pag., Ropažu nov., LV-2135",
+    "object": "Dzīvojamā māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889251",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-889238-11095": {
+    "bis_number": "BIS-BL-889238-11095",
+    "authority": "Salaspils novada pašvaldības iestāde \"Salaspils novada Būvvalde\"",
+    "address": "Stirnu iela 15, Salaspils, Salaspils nov., LV-2169",
+    "object": "Dzīvojamā māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/889238",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888989-6999": {
+    "bis_number": "BIS-BL-888989-6999",
+    "authority": "Saulkrastu novada būvvalde",
+    "address": "Čiekuru iela 16, Pabaži, Saulkrastu pag., Saulkrastu nov., LV-2160",
+    "object": "Saimniecības ēka",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888989",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888916-12228": {
+    "bis_number": "BIS-BL-888916-12228",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Jūras iela 14A, Carnikava, Carnikavas pag., Ādažu nov., LV-2163",
+    "object": "-Viesnīca",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888916",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888906-15888": {
+    "bis_number": "BIS-BL-888906-15888",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "Miglas iela 2, Baloži, Ķekavas nov., LV-2112",
+    "object": "Jauns pieslēgums",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888906",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888860-12453": {
+    "bis_number": "BIS-BL-888860-12453",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Smilškalnu iela 49, Divezeri, Ādažu pag., Ādažu nov., LV-2164",
+    "object": "Elektroapgādes kabelis un sadalne",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888860",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888822-15706": {
+    "bis_number": "BIS-BL-888822-15706",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "Martas iela 5, Pulkarne, Ķekavas pag., Ķekavas nov., LV-2123",
+    "object": "Savrupmāja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888822",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888817-15789": {
+    "bis_number": "BIS-BL-888817-15789",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "Ainavas iela 8, Jaunsils, Ķekavas pag., Ķekavas nov., LV-2123",
+    "object": "Dzīvojamās ēkas jaunbūve",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888817",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888810-12441": {
+    "bis_number": "BIS-BL-888810-12441",
+    "authority": "Ropažu novada pašvaldības būvvalde",
+    "address": "Graudiņu iela 31, Garkalne, Garkalnes pag., Ropažu nov., LV-2137",
+    "object": "Dzīvojamā māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888810",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888710-13698": {
+    "bis_number": "BIS-BL-888710-13698",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Laimas iela 19, Mežāres, Babītes pag., Mārupes nov., LV-2101",
+    "object": "Saimniecības ēka",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888710",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888699-12387": {
+    "bis_number": "BIS-BL-888699-12387",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Mencu iela 8A, Garupe, Carnikavas pag., Ādažu nov., LV-2163",
+    "object": "Dzīvojamā māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888699",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888656-15649": {
+    "bis_number": "BIS-BL-888656-15649",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "Mālu iela 48, Odukalns, Ķekavas pag., Ķekavas nov., LV-2123",
+    "object": "Dzīvojamā māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888656",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888655-15682": {
+    "bis_number": "BIS-BL-888655-15682",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "",
+    "object": "Telekomunikāciju sakaru masts",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888655",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888647-13864": {
+    "bis_number": "BIS-BL-888647-13864",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "",
+    "object": "Elektroapgāde",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888647",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888481-16840": {
+    "bis_number": "BIS-BL-888481-16840",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "Brīvības iela 35, Ogre, Ogres nov., LV-5001",
+    "object": "Elektroapgādes kabeļu pievads",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888481",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888416-16478": {
+    "bis_number": "BIS-BL-888416-16478",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "\"Jurjāņi\", Tīnūžu pag., Ogres nov., LV-5015",
+    "object": "Savrupmāja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888416",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888344-12224": {
+    "bis_number": "BIS-BL-888344-12224",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Virsaišu iela 10, Gauja, Carnikavas pag., Ādažu nov., LV-2163",
+    "object": "Dzīvojamā ēka",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888344",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888340-12328": {
+    "bis_number": "BIS-BL-888340-12328",
+    "authority": "Ropažu novada pašvaldības būvvalde",
+    "address": "Ābeļdārza iela 5, Amatnieki, Garkalnes pag., Ropažu nov., LV-2137",
+    "object": "Dārza māja 1. grupas ēka",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888340",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888299-16525": {
+    "bis_number": "BIS-BL-888299-16525",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "\"Palejas\", Tomes pag., Ogres nov., LV-5020",
+    "object": "Viesu nams",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888299",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888289-22768": {
+    "bis_number": "BIS-BL-888289-22768",
+    "authority": "Jūrmalas Būvvalde",
+    "address": "Silu iela 14B, Jūrmala, LV-2008",
+    "object": "Saimniecības ēka",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888289",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888277-16526": {
+    "bis_number": "BIS-BL-888277-16526",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "\"Palejas\", Tomes pag., Ogres nov., LV-5020",
+    "object": "Saimniecības ēka",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888277",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888225-20982": {
+    "bis_number": "BIS-BL-888225-20982",
+    "authority": "Siguldas novada būvvalde",
+    "address": "\"Lielmargas\", Krimuldas pag., Siguldas nov., LV-2144",
+    "object": "Pirts ēka",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888225",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888080-20795": {
+    "bis_number": "BIS-BL-888080-20795",
+    "authority": "Siguldas novada būvvalde",
+    "address": "Rīgas iela 12, Sigulda, Siguldas nov., LV-2150",
+    "object": "Savrupmāja",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Vienkāršota pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888080",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888068-12412": {
+    "bis_number": "BIS-BL-888068-12412",
+    "authority": "Ropažu novada pašvaldības būvvalde",
+    "address": "\"Strautiņi Nr. 26\", Līči, Stopiņu pag., Ropažu nov., LV-2130",
+    "object": "Privatmājas jaunbūve (esošas ēkas legalizācija)",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888068",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888058-12270": {
+    "bis_number": "BIS-BL-888058-12270",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Krūkļu iela 2, Ādaži, Ādažu nov., LV-2164",
+    "object": "Dzīvojamā māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888058",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888051-16696": {
+    "bis_number": "BIS-BL-888051-16696",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "",
+    "object": "Ūdensvada izbūve",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888051",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888017-13679": {
+    "bis_number": "BIS-BL-888017-13679",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Rūpnieku iela 10, Piņķi, Babītes pag., Mārupes nov., LV-2107",
+    "object": "FUTBOLA SPĒĻU INFORMĀCIJAS APRAIDES BŪVE",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888017",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-888010-16715": {
+    "bis_number": "BIS-BL-888010-16715",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "Kaudzīšu iela 3, Ogre, Ogres nov., LV-5001",
+    "object": "Elektroenerģijas tīklu pārvietošana",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/888010",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-887898-13696": {
+    "bis_number": "BIS-BL-887898-13696",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Smilšu iela 22, Babīte, Babītes pag., Mārupes nov., LV-2101",
+    "object": "Ražošanas korpuss",
+    "phase": "Iecere",
+    "construction_type": "Vienkāršota pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887898",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-887896-12654": {
+    "bis_number": "BIS-BL-887896-12654",
+    "authority": "Ropažu novada pašvaldības būvvalde",
+    "address": "",
+    "object": "Sēņu iela",
+    "phase": "Iecere",
+    "construction_type": "Atjaunošana",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887896",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-887862-16645": {
+    "bis_number": "BIS-BL-887862-16645",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "\"Jaunpinkas\", Ogresgala pag., Ogres nov., LV-5001",
+    "object": "Savrupmāja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887862",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-887825-20804": {
+    "bis_number": "BIS-BL-887825-20804",
+    "authority": "Siguldas novada būvvalde",
+    "address": "Laurenču iela 7, Sigulda, Siguldas nov., LV-2150",
+    "object": "-",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887825",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-887766-20915": {
+    "bis_number": "BIS-BL-887766-20915",
+    "authority": "Siguldas novada būvvalde",
+    "address": "Ernesta Sovera iela 1, Sunīši, Krimuldas pag., Siguldas nov., LV-2144",
+    "object": "-Sociālo grupu dzīvojamā ēka",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887766",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-887705-6918": {
+    "bis_number": "BIS-BL-887705-6918",
+    "authority": "Saulkrastu novada būvvalde",
+    "address": "\"Ģibuferma\", Sējas pag., Saulkrastu nov., LV-2142",
+    "object": "Skābbarības novietne",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887705",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-887513-16512": {
+    "bis_number": "BIS-BL-887513-16512",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "\"Vēsmiņas\", Tomes pag., Ogres nov., LV-5020",
+    "object": "-",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887513",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-887497-11286": {
+    "bis_number": "BIS-BL-887497-11286",
+    "authority": "Salaspils novada pašvaldības iestāde \"Salaspils novada Būvvalde\"",
+    "address": "Paipalu iela 1, Salaspils, Salaspils nov., LV-2121",
+    "object": "Dzīvojamā māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887497",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-887492-11279": {
+    "bis_number": "BIS-BL-887492-11279",
+    "authority": "Salaspils novada pašvaldības iestāde \"Salaspils novada Būvvalde\"",
+    "address": "Augšrūķu iela 14, Salaspils, Salaspils nov., LV-2118",
+    "object": "Dzīvojamā māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887492",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-887469-20751": {
+    "bis_number": "BIS-BL-887469-20751",
+    "authority": "Siguldas novada būvvalde",
+    "address": "Jāņa iela 3, Sigulda, Siguldas nov., LV-2150",
+    "object": "-Dzīvojamā ēka",
+    "phase": "Iecere",
+    "construction_type": "Vienkāršota atjaunošana",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887469",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-887464-12426": {
+    "bis_number": "BIS-BL-887464-12426",
+    "authority": "Ādažu novada būvvalde",
+    "address": "",
+    "object": "Ārējā elektroapgāde",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/887464",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-886110-16755": {
+    "bis_number": "BIS-BL-886110-16755",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "\"Stirnāres\", Ogresgala pag., Ogres nov., LV-5041",
+    "object": "Saimniecības ēka",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/886110",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-886107-22732": {
+    "bis_number": "BIS-BL-886107-22732",
+    "authority": "Jūrmalas Būvvalde",
+    "address": "Valtera prospekts 39, Jūrmala, LV-2008",
+    "object": "Dzīvojamā māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/886107",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-885260-12436": {
+    "bis_number": "BIS-BL-885260-12436",
+    "authority": "Ropažu novada pašvaldības būvvalde",
+    "address": "Lielskultes iela 2, Dreiliņi, Stopiņu pag., Ropažu nov., LV-2130",
+    "object": "Rindu māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/885260",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-885200-15882": {
+    "bis_number": "BIS-BL-885200-15882",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "\"Prilāpi\", Baldones pag., Ķekavas nov., LV-2125",
+    "object": "Pirts",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/885200",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-885100-12316": {
+    "bis_number": "BIS-BL-885100-12316",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Inču iela 4A, Stapriņi, Ādažu pag., Ādažu nov., LV-2164",
+    "object": "Zemsprieguma elektrolīnijas",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/885100",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-885076-15726": {
+    "bis_number": "BIS-BL-885076-15726",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "Rudzupuķu iela 13, Katlakalns, Ķekavas pag., Ķekavas nov., LV-2111",
+    "object": "Savrupmāja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/885076",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-885069-7031": {
+    "bis_number": "BIS-BL-885069-7031",
+    "authority": "Saulkrastu novada būvvalde",
+    "address": "Stacijas iela 9A, Saulkrasti, Saulkrastu nov., LV-2160",
+    "object": "Šķūnis",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/885069",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-884899-15600": {
+    "bis_number": "BIS-BL-884899-15600",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "Pavasara iela 4, Sūnupes, Baldones pag., Ķekavas nov., LV-2125",
+    "object": "Saimniecības ēka",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/884899",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-884353-12198": {
+    "bis_number": "BIS-BL-884353-12198",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Smilgu 5. līnija 6, Ādaži, Ādažu nov., LV-2164",
+    "object": "Dārza māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/884353",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-884344-6984": {
+    "bis_number": "BIS-BL-884344-6984",
+    "authority": "Saulkrastu novada būvvalde",
+    "address": "Ainažu iela 63, Saulkrasti, Saulkrastu nov., LV-2161",
+    "object": "Pirts jaunbūve",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/884344",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-884332-20727": {
+    "bis_number": "BIS-BL-884332-20727",
+    "authority": "Siguldas novada būvvalde",
+    "address": "\"Kalnamiķeļi\", Krimuldas pag., Siguldas nov., LV-2150",
+    "object": "Garāža",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/884332",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-883227-13938": {
+    "bis_number": "BIS-BL-883227-13938",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Zirgu iela 1, Tīraine, Mārupes pag., Mārupes nov., LV-2167",
+    "object": "Savrupmāja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/883227",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-883166-12099": {
+    "bis_number": "BIS-BL-883166-12099",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Mazā Ziedleju iela 1, Carnikava, Carnikavas pag., Ādažu nov., LV-2163",
+    "object": "Dzīvojamā māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/883166",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-883124-13719": {
+    "bis_number": "BIS-BL-883124-13719",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Vīnkalnu iela 17, Mārupe, Mārupes nov., LV-2167",
+    "object": "Jauns elektroapgādes pieslēgums",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/883124",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-883122-22969": {
+    "bis_number": "BIS-BL-883122-22969",
+    "authority": "Jūrmalas Būvvalde",
+    "address": "Jūras iela 32A, Jūrmala, LV-2015",
+    "object": "Sadalne",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/883122",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-883121-15904": {
+    "bis_number": "BIS-BL-883121-15904",
+    "authority": "OLAINES NOVADA PAŠVALDĪBAS BŪVVALDE",
+    "address": "\"Dināri\", Stūnīši, Olaines pag., Olaines nov., LV-2127",
+    "object": "zemsprieguma kabeļu elektrolīnijas",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/883121",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-883119-15705": {
+    "bis_number": "BIS-BL-883119-15705",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "Kronīšu iela 11, Katlakalns, Ķekavas pag., Ķekavas nov., LV-2111",
+    "object": "Dzīvojamā māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/883119",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-883025-12202": {
+    "bis_number": "BIS-BL-883025-12202",
+    "authority": "Ropažu novada pašvaldības būvvalde",
+    "address": "Sēņu iela 20, Garkalne, Garkalnes pag., Ropažu nov., LV-2137",
+    "object": "Dzīvojamā māja",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/883025",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-883004-22956": {
+    "bis_number": "BIS-BL-883004-22956",
+    "authority": "Jūrmalas Būvvalde",
+    "address": "Studentu iela 3, Jūrmala, LV-2015",
+    "object": "Dzīvojamās ēkas gāzes apgāde",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/883004",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-882906-13549": {
+    "bis_number": "BIS-BL-882906-13549",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Stirnu iela 39, Lapsas, Babītes pag., Mārupes nov., LV-2107",
+    "object": "Savrupmāja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/882906",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-882889-12411": {
+    "bis_number": "BIS-BL-882889-12411",
+    "authority": "Ādažu novada būvvalde",
+    "address": "",
+    "object": "Apgaismošanas līnijas ar balstiem un lampām",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/882889",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-882824-12599": {
+    "bis_number": "BIS-BL-882824-12599",
+    "authority": "Ropažu novada pašvaldības būvvalde",
+    "address": "Vijupes iela 14, Sunīši, Garkalnes pag., Ropažu nov., LV-2137",
+    "object": "elektrības kabelis",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/882824",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-882787-13724": {
+    "bis_number": "BIS-BL-882787-13724",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "",
+    "object": "Ārējā elektroapgāde",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/882787",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-882786-13827": {
+    "bis_number": "BIS-BL-882786-13827",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Spilvas iela 5, Mārupe, Mārupes nov., LV-2167",
+    "object": "0.4kV elektropārvades līnijas",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/882786",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-882771-12324": {
+    "bis_number": "BIS-BL-882771-12324",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Dzilnu iela 7, Kadaga, Ādažu pag., Ādažu nov., LV-2103",
+    "object": "Divģimeņu dzīvojamā māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/882771",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-882734-12261": {
+    "bis_number": "BIS-BL-882734-12261",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Rīgas gatve 53, Ādaži, Ādažu nov., LV-2164",
+    "object": "-",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Atjaunošana",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/882734",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-882665-6927": {
+    "bis_number": "BIS-BL-882665-6927",
+    "authority": "Saulkrastu novada būvvalde",
+    "address": "Ainažu iela 127, Saulkrasti, Saulkrastu nov., LV-2161",
+    "object": "Saimniecības ēka",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/882665",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-882664-13634": {
+    "bis_number": "BIS-BL-882664-13634",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Priežu malas iela 1, Spuņciems, Salas pag., Mārupes nov., LV-2105",
+    "object": "Žogs",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/882664",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-882547-13550": {
+    "bis_number": "BIS-BL-882547-13550",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Gleznotāju iela 4, Mežāres, Babītes pag., Mārupes nov., LV-2101",
+    "object": "Dzīvojamā māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/882547",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-881379-12232": {
+    "bis_number": "BIS-BL-881379-12232",
+    "authority": "Ādažu novada būvvalde",
+    "address": "",
+    "object": "Dzīvojamā māja",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/881379",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-881375-22608": {
+    "bis_number": "BIS-BL-881375-22608",
+    "authority": "Jūrmalas Būvvalde",
+    "address": "Plūdu iela 2, Jūrmala, LV-2015",
+    "object": "Saimniecības ēka",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/881375",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-881361-13561": {
+    "bis_number": "BIS-BL-881361-13561",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Pērļu iela 11, Vētras, Mārupes pag., Mārupes nov., LV-2167",
+    "object": "PALĪGĒKA",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/881361",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
+  },
+  "BIS-BL-881349-13510": {
+    "bis_number": "BIS-BL-881349-13510",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Celmu iela 2, Jaunmārupe, Mārupes pag., Mārupes nov., LV-2166",
+    "object": "Dzīvojamā māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/881349",
+    "last_seen": "2025-10-14",
+    "first_seen": "2025-10-14"
   }
 }
