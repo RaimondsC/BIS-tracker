@@ -2,10 +2,10 @@
   "baseline_run": false,
   "baseline_complete": false,
   "pages_scanned_this_run": 59,
-  "seq_start": 392,
+  "seq_start": 451,
   "seq_end": 3000,
-  "seq_last_scanned": 450,
-  "next_page": 451,
+  "seq_last_scanned": 515,
+  "next_page": 516,
   "failed_queue_size": 48,
   "storm_cooldowns_used": 2
 }
