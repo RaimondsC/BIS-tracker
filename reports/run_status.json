@@ -1,11 +1,11 @@
 {
   "baseline_run": false,
   "baseline_complete": false,
-  "pages_scanned_this_run": 59,
-  "seq_start": 870,
+  "pages_scanned_this_run": 58,
+  "seq_start": 922,
   "seq_end": 3000,
-  "seq_last_scanned": 921,
-  "next_page": 922,
+  "seq_last_scanned": 971,
+  "next_page": 972,
   "failed_queue_size": 48,
   "storm_cooldowns_used": 2
 }
