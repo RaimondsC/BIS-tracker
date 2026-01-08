@@ -30532,7 +30532,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916673",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-916659-13100": {
@@ -30543,7 +30543,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916659",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-916575-12702": {
@@ -30554,7 +30554,7 @@
     "phase": "Iecere",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916575",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-916517-23607": {
@@ -30565,7 +30565,7 @@
     "phase": "Iecere",
     "construction_type": "Vienkāršota atjaunošana",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916517",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-916515-23608": {
@@ -30576,7 +30576,7 @@
     "phase": "Iecere",
     "construction_type": "Vienkāršota atjaunošana",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916515",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-916435-13098": {
@@ -30587,7 +30587,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916435",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-916369-14393": {
@@ -30598,7 +30598,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916369",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-916106-21307": {
@@ -30606,21 +30606,21 @@
     "authority": "Siguldas novada būvvalde",
     "address": "Jaunatnes iela 8, Ragana, Krimuldas pag., Siguldas nov., LV-2144",
     "object": "Palīgēka",
-    "phase": "Iecere",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916106",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-916044-14376": {
     "bis_number": "BIS-BL-916044-14376",
     "authority": "Mārupes novada Būvvalde",
     "address": "Spilves iela 65C, Spilve, Babītes pag., Mārupes nov., LV-2101",
-    "object": "Savrupmāja Nr. 2",
+    "object": "Savrupmāja Nr. 1",
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916044",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915968-21305": {
@@ -30631,7 +30631,7 @@
     "phase": "Iecere",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915968",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915950-17247": {
@@ -30642,18 +30642,18 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915950",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915935-21301": {
     "bis_number": "BIS-BL-915935-21301",
     "authority": "Siguldas novada būvvalde",
-    "address": "\"Krastmalas\", Allažu pag., Siguldas nov., LV-2154",
-    "object": "Bruģis pie dzelzsbetona seguma",
+    "address": "\"Akots\", Allažu pag., Siguldas nov., LV-2154",
+    "object": "Dzelzsbetona segums pie angāra",
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915935",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915840-13076": {
@@ -30672,10 +30672,10 @@
     "authority": "Siguldas novada būvvalde",
     "address": "Līvkalna iela 28, Sigulda, Siguldas nov., LV-2150",
     "object": "Palīgēka",
-    "phase": "Iecere",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915776",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915595-23582": {
@@ -30686,7 +30686,7 @@
     "phase": "Iecere",
     "construction_type": "Vienkāršota pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915595",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915416-11481": {
@@ -30697,7 +30697,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915416",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915270-14374": {
@@ -30708,7 +30708,7 @@
     "phase": "Iecere",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915270",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915205-13097": {
@@ -30719,7 +30719,7 @@
     "phase": "Iecere",
     "construction_type": "Vienkāršota atjaunošana",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915205",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915050-21277": {
@@ -30730,7 +30730,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915050",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915027-21284": {
@@ -30741,7 +30741,7 @@
     "phase": "Iecere",
     "construction_type": "Vienkāršota atjaunošana",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915027",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915026-17217": {
@@ -30752,7 +30752,7 @@
     "phase": "Iecere",
     "construction_type": "Vienkāršota atjaunošana",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915026",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-915015-23562": {
@@ -30763,7 +30763,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915015",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-914969-13059": {
@@ -30774,7 +30774,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/914969",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-914954-12675": {
@@ -30785,7 +30785,7 @@
     "phase": "Iecere",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/914954",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-914597-14379": {
@@ -30796,7 +30796,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/914597",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-914506-13074": {
@@ -30807,7 +30807,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/914506",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913920-11478": {
@@ -30818,7 +30818,7 @@
     "phase": "Iecere",
     "construction_type": "Vienkāršota atjaunošana",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913920",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913918-16328": {
@@ -30840,7 +30840,7 @@
     "phase": "Iecere",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913881",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913824-23604": {
@@ -30851,7 +30851,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913824",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913701-17209": {
@@ -30862,18 +30862,18 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913701",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913697-16337": {
     "bis_number": "BIS-BL-913697-16337",
     "authority": "OLAINES NOVADA PAŠVALDĪBAS BŪVVALDE",
     "address": "",
-    "object": "Sadzīves kanalizācijas tīkli",
+    "object": "Ūdensvads",
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913697",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913654-14350": {
@@ -30884,7 +30884,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913654",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913625-12663": {
@@ -30895,7 +30895,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913625",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913454-17205": {
@@ -30913,22 +30913,22 @@
     "bis_number": "BIS-BL-913420-23453",
     "authority": "Jūrmalas Būvvalde",
     "address": "Kalēju iela 67, Jūrmala, LV-2008",
-    "object": "Dzīvojamā māja",
+    "object": "Pirts",
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913420",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913343-14325": {
     "bis_number": "BIS-BL-913343-14325",
     "authority": "Mārupes novada Būvvalde",
     "address": "Daugavas iela 27, Mārupe, Mārupes nov., LV-2167",
-    "object": "-",
+    "object": "Suņu frizētava",
     "phase": "Iecere",
     "construction_type": "Vienkāršota pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913343",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913176-14341": {
@@ -30939,7 +30939,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913176",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913157-23452": {
@@ -30950,7 +30950,7 @@
     "phase": "Iecere",
     "construction_type": "Vienkāršota atjaunošana",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913157",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913129-23573": {
@@ -30961,7 +30961,7 @@
     "phase": "Iecere",
     "construction_type": "Vienkāršota pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913129",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913073-17189": {
@@ -30972,7 +30972,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913073",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-913002-17254": {
@@ -30983,7 +30983,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913002",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-912970-16133": {
@@ -30994,7 +30994,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/912970",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-912928-21272": {
@@ -31005,7 +31005,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/912928",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-912805-7367": {
@@ -31181,7 +31181,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910634",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-910618-21304": {
@@ -31192,18 +31192,18 @@
     "phase": "Iecere",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910618",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-910610-16180": {
     "bis_number": "BIS-BL-910610-16180",
     "authority": "Ķekavas novada pašvaldības būvvalde",
     "address": "Žagaru iela 8, Saulgoži, Ķekavas pag., Ķekavas nov., LV-2123",
-    "object": "Savrupmāja",
+    "object": "Dīķis",
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910610",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-910583-11443": {
@@ -31214,7 +31214,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910583",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-910547-13012": {
@@ -31225,7 +31225,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910547",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-910201-16084": {
@@ -31236,7 +31236,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910201",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-910184-12604": {
@@ -31247,7 +31247,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910184",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-910182-21273": {
@@ -31258,7 +31258,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910182",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-910152-14278": {
@@ -31269,7 +31269,7 @@
     "phase": "Iecere",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910152",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-910106-14281": {
@@ -31280,7 +31280,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910106",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-909844-13028": {
@@ -31291,7 +31291,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Vienkāršota pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/909844",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-909807-16091": {
@@ -31555,7 +31555,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907679",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907606-17064": {
@@ -31566,7 +31566,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Atjaunošana",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907606",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907539-21269": {
@@ -31577,7 +31577,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907539",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907522-11384": {
@@ -31588,7 +31588,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907522",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907513-11393": {
@@ -31599,7 +31599,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Vienkāršota pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907513",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907485-21156": {
@@ -31610,7 +31610,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907485",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907440-11450": {
@@ -31621,18 +31621,18 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907440",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907436-11452": {
     "bis_number": "BIS-BL-907436-11452",
     "authority": "Salaspils novada pašvaldības iestāde \"Salaspils novada Būvvalde\"",
     "address": "Pieneņu iela 5, Salaspils, Salaspils nov., LV-2121",
-    "object": "Dzīvojamā māja",
+    "object": "Saimniecības ēka",
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907436",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907412-11395": {
@@ -31643,7 +31643,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907412",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907387-11477": {
@@ -31654,7 +31654,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907387",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907364-11468": {
@@ -31665,7 +31665,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907364",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907337-12977": {
@@ -31676,7 +31676,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907337",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907323-11480": {
@@ -31687,7 +31687,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907323",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907292-14134": {
@@ -31698,7 +31698,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907292",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907276-12891": {
@@ -31709,7 +31709,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Vienkāršota pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907276",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907270-23403": {
@@ -31720,7 +31720,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907270",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907235-12884": {
@@ -31731,7 +31731,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Vienkāršota pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907235",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907158-16093": {
@@ -31742,7 +31742,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907158",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907128-16026": {
@@ -31753,7 +31753,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907128",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907092-14203": {
@@ -31764,7 +31764,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907092",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-907052-16212": {
@@ -31775,7 +31775,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907052",
-    "last_seen": "2026-01-06",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-06"
   },
   "BIS-BL-905695-23291": {
@@ -32057,11 +32057,11 @@
     "bis_number": "BIS-BL-911139-13003",
     "authority": "Ropažu novada pašvaldības būvvalde",
     "address": "Bitēnu iela 4A, Berģi, Garkalnes pag., Ropažu nov., LV-1024",
-    "object": "Terase",
+    "object": "Saimniecības ēka",
     "phase": "Iecere",
-    "construction_type": "Jauna būvniecība",
+    "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/911139",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-911126-11428": {
@@ -32072,7 +32072,7 @@
     "phase": "Iecere",
     "construction_type": "Atjaunošana",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/911126",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-911095-14342": {
@@ -32083,7 +32083,7 @@
     "phase": "Iecere",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/911095",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910956-16358": {
@@ -32094,7 +32094,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910956",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910908-14316": {
@@ -32105,7 +32105,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910908",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910868-14283": {
@@ -32113,10 +32113,10 @@
     "authority": "Mārupes novada Būvvalde",
     "address": "Mārtiņa iela 2, Piņķi, Babītes pag., Mārupes nov., LV-2107",
     "object": "Garāža",
-    "phase": "Iecere",
-    "construction_type": "Vienkāršota pārbūve",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910868",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910728-16134": {
@@ -32127,18 +32127,18 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910728",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910699-16099": {
     "bis_number": "BIS-BL-910699-16099",
     "authority": "Ķekavas novada pašvaldības būvvalde",
     "address": "",
-    "object": "Šķūnis",
+    "object": "Saimniecības ēka",
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910699",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910677-21254": {
@@ -32149,7 +32149,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910677",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910676-16265": {
@@ -32160,7 +32160,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910676",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910660-17132": {
@@ -32171,7 +32171,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Vienkāršota pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910660",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-909515-16365": {
@@ -32476,10 +32476,10 @@
     "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
     "address": "\"Ozolkalni\", Jumpravas pag., Ogres nov., LV-5022",
     "object": "-",
-    "phase": "Iecere",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916895",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-916724-16366": {
@@ -32490,7 +32490,7 @@
     "phase": "Iecere",
     "construction_type": "Pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916724",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-915406-14362": {
@@ -32501,7 +32501,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915406",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910784-11433": {
@@ -32512,7 +32512,7 @@
     "phase": "Projektēšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910784",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910768-21222": {
@@ -32523,7 +32523,7 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910768",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910457-14295": {
@@ -32534,7 +32534,7 @@
     "phase": "Iecere",
     "construction_type": "Jauna būvniecība",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910457",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
   },
   "BIS-BL-910419-14259": {
@@ -32545,7 +32545,392 @@
     "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
     "construction_type": "Vienkāršota pārbūve",
     "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/910419",
-    "last_seen": "2026-01-07",
+    "last_seen": "2026-01-08",
     "first_seen": "2026-01-07"
+  },
+  "BIS-BL-907013-23323": {
+    "bis_number": "BIS-BL-907013-23323",
+    "authority": "Jūrmalas Būvvalde",
+    "address": "Turaidas iela 73B, Jūrmala, LV-2015",
+    "object": "Zemsprieguma elektropārvades līnijas",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/907013",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906995-14117": {
+    "bis_number": "BIS-BL-906995-14117",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Briežu iela 2, Lapsas, Babītes pag., Mārupes nov., LV-2107",
+    "object": "Ģimenes dzīvojamā māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906995",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906920-16177": {
+    "bis_number": "BIS-BL-906920-16177",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "",
+    "object": "0.4 kV ārējā elektroapgāde",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906920",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906878-23380": {
+    "bis_number": "BIS-BL-906878-23380",
+    "authority": "Jūrmalas Būvvalde",
+    "address": "Kalēju iela 63, Jūrmala, LV-2008",
+    "object": "kanalizācijas pievads",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906878",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906840-21179": {
+    "bis_number": "BIS-BL-906840-21179",
+    "authority": "Siguldas novada būvvalde",
+    "address": "Zaru iela 8, Sigulda, Siguldas nov., LV-2150",
+    "object": "Gāzesvada pievads",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906840",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906812-17061": {
+    "bis_number": "BIS-BL-906812-17061",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "\"Jasmīni\", Birzgales pag., Ogres nov., LV-5033",
+    "object": "Saimniecības ēka",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906812",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906811-17034": {
+    "bis_number": "BIS-BL-906811-17034",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "",
+    "object": "Dzīvojamā ēka",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906811",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906790-17091": {
+    "bis_number": "BIS-BL-906790-17091",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "Stirnu iela 6, Ogre, Ogres nov., LV-5001",
+    "object": "Administratīvā ēka",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Vienkāršota atjaunošana",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906790",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906766-17028": {
+    "bis_number": "BIS-BL-906766-17028",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "",
+    "object": "Dzīvojamā māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906766",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906740-14328": {
+    "bis_number": "BIS-BL-906740-14328",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Mežezera iela 2, Dzilnuciems, Babītes pag., Mārupes nov., LV-2107",
+    "object": "Elektrokabelis",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906740",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906687-16164": {
+    "bis_number": "BIS-BL-906687-16164",
+    "authority": "OLAINES NOVADA PAŠVALDĪBAS BŪVVALDE",
+    "address": "Zeiferta iela 12, Olaine, Olaines nov., LV-2114",
+    "object": "-",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Vienkāršota pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906687",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906624-23346": {
+    "bis_number": "BIS-BL-906624-23346",
+    "authority": "Jūrmalas Būvvalde",
+    "address": "Kļavu iela 15, Jūrmala, LV-2015",
+    "object": "Gāzesvada pievads",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906624",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906540-12638": {
+    "bis_number": "BIS-BL-906540-12638",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Lakstīgalu iela 21, Ādaži, Ādažu nov., LV-2164",
+    "object": "Pirts",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906540",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906493-11355": {
+    "bis_number": "BIS-BL-906493-11355",
+    "authority": "Salaspils novada pašvaldības iestāde \"Salaspils novada Būvvalde\"",
+    "address": "Aidas iela 3, Saulkalne, Salaspils pag., Salaspils nov., LV-2117",
+    "object": "Dzīvojamā māja",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906493",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906471-17146": {
+    "bis_number": "BIS-BL-906471-17146",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "Uzvaras iela 11, Ogre, Ogres nov., LV-5001",
+    "object": "-",
+    "phase": "Iecere",
+    "construction_type": "Vienkāršota pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906471",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906408-23366": {
+    "bis_number": "BIS-BL-906408-23366",
+    "authority": "Jūrmalas Būvvalde",
+    "address": "Mūsas iela 4, Jūrmala, LV-2008",
+    "object": "Palīgēka",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906408",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906404-14124": {
+    "bis_number": "BIS-BL-906404-14124",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Rītupes iela 8, Spilve, Babītes pag., Mārupes nov., LV-2101",
+    "object": "Divu dzīvokļu dzīvojamā māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906404",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906391-14107": {
+    "bis_number": "BIS-BL-906391-14107",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Plieņciema iela 37, Mārupe, Mārupes nov., LV-2167",
+    "object": "Bruģakmens laukums",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906391",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906357-16148": {
+    "bis_number": "BIS-BL-906357-16148",
+    "authority": "OLAINES NOVADA PAŠVALDĪBAS BŪVVALDE",
+    "address": "\"Meža Pasaule\", Stūnīši, Olaines pag., Olaines nov., LV-2127",
+    "object": "Palīgēka",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906357",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906340-16007": {
+    "bis_number": "BIS-BL-906340-16007",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "\"Elīnas Staļļi\", Baldones pag., Ķekavas nov., LV-2125",
+    "object": "Vasaras virtuve",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906340",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906317-17213": {
+    "bis_number": "BIS-BL-906317-17213",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "Ogres iela 3, Ogre, Ogres nov., LV-5001",
+    "object": "gāzesvada pievads",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906317",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906312-14326": {
+    "bis_number": "BIS-BL-906312-14326",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "",
+    "object": "zemsprieguma kabeļu elektrolīnijas",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906312",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906306-7337": {
+    "bis_number": "BIS-BL-906306-7337",
+    "authority": "Saulkrastu novada būvvalde",
+    "address": "",
+    "object": "Zemsprieguma kabeļlīnijas",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906306",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906290-17050": {
+    "bis_number": "BIS-BL-906290-17050",
+    "authority": "Ogres novada pašvaldības centrālās administrācijas Ogres novada būvvalde",
+    "address": "\"Līčkalni\", Tomes pag., Ogres nov., LV-5020",
+    "object": "Dzīvojamā māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906290",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906277-12868": {
+    "bis_number": "BIS-BL-906277-12868",
+    "authority": "Ropažu novada pašvaldības būvvalde",
+    "address": "Rožu iela 11, Bajāri, Ropažu pag., Ropažu nov., LV-2135",
+    "object": "Palīgēka",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906277",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906272-11348": {
+    "bis_number": "BIS-BL-906272-11348",
+    "authority": "Salaspils novada pašvaldības iestāde \"Salaspils novada Būvvalde\"",
+    "address": "Balto Ķiršu iela 32, Jaunsaurieši, Salaspils pag., Salaspils nov., LV-2118",
+    "object": "Saimniecības ēka",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906272",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906112-16004": {
+    "bis_number": "BIS-BL-906112-16004",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "\"Aleksīši\", Baldones pag., Ķekavas nov., LV-4125",
+    "object": "Dzīvojamā māja",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906112",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906101-12942": {
+    "bis_number": "BIS-BL-906101-12942",
+    "authority": "Ropažu novada pašvaldības būvvalde",
+    "address": "",
+    "object": "Iebrauktuve ar caurteku",
+    "phase": "Būvdarbu uzsākšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906101",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906093-7328": {
+    "bis_number": "BIS-BL-906093-7328",
+    "authority": "Saulkrastu novada būvvalde",
+    "address": "\"Māras\", Lilaste, Saulkrastu pag., Saulkrastu nov., LV-2160",
+    "object": "Dzīvojamā māja",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906093",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-906064-14119": {
+    "bis_number": "BIS-BL-906064-14119",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Unguru iela 5, Mārupe, Mārupes nov., LV-2167",
+    "object": "Dzīvojamā ēka",
+    "phase": "Projektēšanas nosacījumu izpilde",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/906064",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-915339-16220": {
+    "bis_number": "BIS-BL-915339-16220",
+    "authority": "Ķekavas novada pašvaldības būvvalde",
+    "address": "\"Kalnalīdakas\", Baldones pag., Ķekavas nov., LV-2125",
+    "object": "Dīķis",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/915339",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-914557-14399": {
+    "bis_number": "BIS-BL-914557-14399",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "\"Kūlīši\", Mārupes pag., Mārupes nov., LV-2167",
+    "object": "Autocentrs",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/914557",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-913352-12706": {
+    "bis_number": "BIS-BL-913352-12706",
+    "authority": "Ādažu novada būvvalde",
+    "address": "Kokgaujas iela 20, Carnikava, Carnikavas pag., Ādažu nov., LV-2163",
+    "object": "Vasarnīca",
+    "phase": "Iecere",
+    "construction_type": "Pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/913352",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-917108-13105": {
+    "bis_number": "BIS-BL-917108-13105",
+    "authority": "Ropažu novada pašvaldības būvvalde",
+    "address": "Lapsu iela 2, Rumbula, Stopiņu pag., Ropažu nov., LV-2121",
+    "object": "Elektroapgādes sadale",
+    "phase": "Iecere",
+    "construction_type": "Jauna būvniecība",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/917108",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
+  },
+  "BIS-BL-916353-14400": {
+    "bis_number": "BIS-BL-916353-14400",
+    "authority": "Mārupes novada Būvvalde",
+    "address": "Cīruļu iela 4, Piņķi, Babītes pag., Mārupes nov., LV-2107",
+    "object": "-",
+    "phase": "Iecere",
+    "construction_type": "Vienkāršota pārbūve",
+    "details_url": "https://bis.gov.lv/bisp/lv/planned_constructions/916353",
+    "last_seen": "2026-01-08",
+    "first_seen": "2026-01-08"
   }
 }
